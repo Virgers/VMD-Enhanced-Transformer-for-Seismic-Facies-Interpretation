@@ -1,7 +1,7 @@
 # Time Series Library (TSlib)
 We fork the THUML time-series library for solving the seismic facies interpretation task. Specifically, we utilize the open-source data F3 and Parihaka dataset to verify our improved Label-integrated and VMD-augmented transformer.
 
-## Usage
+// ## Usage
 
 1. Install Python 3.8. For convenience, execute the following command.
 
@@ -30,4 +30,4 @@ bash ./scripts/classification/TimesNet.sh
 
 ## Acknowledgement
 
-We appreciate the THUML for this project : https://github.com/thuml/Time-Series-Library
+We appreciate the THUML for this project : https://github.com/thuml/Time-Series-Library //
