@@ -14,20 +14,6 @@ import logging
 import numpy as np
 logger = logging.getLogger('__main__')
 
-""" 需要更改的参数: 
-    self.data = 'custom' 对应 test_factory, test_loader 生成facies的数据
-    output_dir  模型保存地址
-    is_training 是否训练
-    model       选择训练模型    [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer] 其中之一
-    root_path   数据根目录
-    data_path   数据地址结合root_path
-    label_path  标签地址结合root_path
-    seq_len     数据维度 facies h: 255
-    c_out       输出维度 facies 一共 6类
-    num_workers 没有多GPU训练就改为0
-    batch_size  本身数据不是很大, 受到其他参数影响, 视情况更改
-    train_epochs轮数
-"""
 
 class Options(object):
 
@@ -54,13 +40,19 @@ class Options(object):
         self.parser.add_argument('--task_name', type=str, default='classification')
         self.parser.add_argument('--model', type=str,  default='iTransformer',
                             help='model name, options: [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer, BiLSTM]')
+        self.parser.add_argument('--batch_size', type=int, default=16, help='batch size of train input data')
+        self.parser.add_argument('--val_proportion', type=float, default=0.001, help='seismic data for test')
+        self.parser.add_argument('--train_proportion', type=float, default=0.00001, help='seismic data for train')
+        self.parser.add_argument('--test_proportion', type=float, default=0.0001, help='seismic data for test')
+
+        # F3dataset configuration 
         self.parser.add_argument('--root_path', type=str, default='/home/dell/disk1/Jinlong/faciesdata', help='root path of the data file')
-
-
         self.parser.add_argument('--data_path', type=str, default='train_seismic.npy', help='data npy file')
         self.parser.add_argument('--label_path', type=str, default='train_labels.npy', help='label npy file')
         self.parser.add_argument('--mask_path', type=str, default='train_labels.npy', help='mask npy file')
         
+        # Parihaka dataset configuration
+        # self.parser.add_argument('--root_path', type=str, default='/home/dell/disk1/Jinlong/faciesdata', help='root path of the data file')
         # self.parser.add_argument('--data_path', type=str, default='data_train.npz', help='data npy file')
         # self.parser.add_argument('--label_path', type=str, default='labels_train.npz', help='label npy file')
         # self.parser.add_argument('--mask_path', type=str, default='labels_train.np
@@ -69,44 +61,26 @@ class Options(object):
         self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
         self.parser.add_argument('--vmd_data_path', type=str, default='full_F3_vmd.npy', help='vmd npy data file') 
         self.parser.add_argument('--is_vmd', type=bool, default=False , help='whether using the vmd')
+        self.parser.add_argument('--train_epochs', type=int, default=1, help='train epochs')
         self.parser.add_argument('--embedding_flag', type=bool, default=False, help='if set true model apply padding mask as attn mask')
-        self.parser.add_argument('--train_proportion', type=float, default=0.00001, help='seismic data for train')
-        self.parser.add_argument('--test_proportion', type=float, default=0.0001, help='seismic data for test')
+        self.parser.add_argument('--mask_rate', type=int, default=0.125, help='mask rate below is masked')
 
         self.parser.add_argument('--checkpoints_test_only', type=str, default='/home/dell/disk1/Jinlong/Time-Series-Library-main/checkpoints/2024-06-13 12:26:26-iTransformer-trainproportion_0.01-testproportion_0.01-maskrate_0.125-isvmd_False-embedflag_False-epochs_14-backbone_False-batchsize_16-0/checkpoint.pth', help='location of model checkpoints')
-        self.parser.add_argument('--train_epochs', type=int, default=1, help='train epochs')
-
-
-        self.parser.add_argument('--use_ssl_model', type=bool, default=False, help='for using pretrained model')
-    
-        self.parser.add_argument('--ssl_model_path', type=str, default='/home/dell/disk1/Jinlong/Time-Series-Library-main/checkpoints/2024-06-07 10:49:05-iTransformer-trainproportion_0.8-testproportion_0.1-masktype_random-maskrate_0.25-isvmd_False-embedflag_False-epochs_6-backbone_False-batchsize_256-0/checkpoint.pth', help='for TimesBlock')
-        
-        self.parser.add_argument('--mask_rate', type=int, default=0.125, help='mask rate below is masked')
-    
-        self.parser.add_argument('--val_proportion', type=float, default=0.001, help='seismic data for test')
-        self.parser.add_argument('--batch_size', type=int, default=16, help='batch size of train input data')
-
-      
 
         self.parser.add_argument('--model_id', type=str,  default='train', help='model id')
         # data loader
         self.parser.add_argument('--data', type=str, default='TSF', help='dataset type')
-
-        self.parser.add_argument('--data2_path', type=str, default='330NZ_VMD_facies_randomlu_selected_100_selected.npy', help='data npy file')
-        self.parser.add_argument('--label2_path', type=str, default='330NZ_VMD_facies_randomlu_selected_100_selectedlabel.npy', help='label npy file')
-        
 
         self.parser.add_argument('--attn_mask_path', type=str, default='labels.npy', help='mask npy file')
 
         self.parser.add_argument('--is_attn_mask', type=bool, default=False, help='if set true model apply padding mask as attn mask')
         self.parser.add_argument('--att_mask_none', type=bool, default=True, help='if set true model apply padding mask as attn mask')
 
-
         self.parser.add_argument('--val_test_proportion', type=float, default=0.005, help='seismic data for test')
         self.parser.add_argument('--self_supervised_proportion', type=float, default=0.005, help='seismic data for test')
         self.parser.add_argument('--max_features', type=int, default=255, help='Vocabulary size')
         self.parser.add_argument('--embed_size', type=int, default=64, help='Embedding dimension')
-        self.parser.add_argument('--num_class', type=int, default=6, help='Embesdding dimension')
+        self.parser.add_argument('--num_class', type=int, default=6, help='Embedding dimension')
 
         self.parser.add_argument('--num_class2', type=int, default=6, help='Embedding dimension')
         
@@ -125,8 +99,6 @@ class Options(object):
         self.parser.add_argument('--pred_len', type=int, default=255, help='prediction sequence length')
 
         # model define
-      
-
         self.parser.add_argument('--top_k', type=int, default=3, help='for TimesBlock')
         self.parser.add_argument('--num_kernels', type=int, default=6, help='for Inception')
         self.parser.add_argument('--enc_in', type=int, default=1, help='encoder input size')
@@ -163,7 +135,6 @@ class Options(object):
         self.parser.add_argument('--devices', type=str, default='0,1,2,3', help='device ids of multile gpus')
         self.parser.add_argument('--exp_name', type=str, default='MTSF',
                             help='experiemnt name, options:[MTSF, partial_train]')
-        
         self.parser.add_argument('--channel_independence', type=bool, default=False, help='whether to use channel_independence mechanism')
         self.parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
         self.parser.add_argument('--class_strategy', type=str, default='projection', help='projection/average/cls_token')
