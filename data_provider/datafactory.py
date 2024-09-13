@@ -1,7 +1,7 @@
-from test_dataloader import TSF_custom
+from data_provider.dataloader import TSF_custom
 # from test_dataloader2 import TSF_custom
 
-from test_uea import collate_fn
+from data_provider.uea import collate_fn
 from torch.utils.data import DataLoader
 
 data_dict = {

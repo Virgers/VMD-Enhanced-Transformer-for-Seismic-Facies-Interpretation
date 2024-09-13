@@ -15,7 +15,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] ="0"
 def main(config):
     # we have other tasks, for simplicty only keep classifcation here
     if args.task_name =='classification':
-        from test_exp_classification import Exp_Classification
+        from exp.exp_classification import Exp_Classification
         Exp = Exp_Classification
 
     now = datetime.datetime.now()
