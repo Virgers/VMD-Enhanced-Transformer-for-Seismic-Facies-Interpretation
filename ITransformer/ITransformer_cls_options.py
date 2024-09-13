@@ -30,8 +30,10 @@ class Options(object):
         self.parser = argparse.ArgumentParser(description='TimesNet')
         self.parser.add_argument('--config', dest='config_filepath',
                                  help='Configuration .json file (optional). Overwrites existing command-line args!')
-        self.parser.add_argument('--output_dir', default='/home/dell/disk1/Jinlong/Time-Series-Library-main/output', 
+        self.parser.add_argument('--output_dir', default=r'F:\test', 
                                  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
+        # self.parser.add_argument('--output_dir', default='/home/dell/disk1/Jinlong/Time-Series-Library-main/output', 
+                                #  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
         self.parser.add_argument('--dataset', type=str, default='f3')
         self.parser.add_argument('--is_training', type=int,  default=1, help='status')
         self.parser.add_argument('--is_pre_training', type=int,  default=0, help='status')
@@ -41,12 +43,12 @@ class Options(object):
         self.parser.add_argument('--model', type=str,  default='iTransformer',
                             help='model name, options: [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer, BiLSTM]')
         self.parser.add_argument('--batch_size', type=int, default=16, help='batch size of train input data')
-        self.parser.add_argument('--val_proportion', type=float, default=0.001, help='seismic data for test')
+        self.parser.add_argument('--val_proportion', type=float, default=0.00001, help='seismic data for test')
         self.parser.add_argument('--train_proportion', type=float, default=0.00001, help='seismic data for train')
-        self.parser.add_argument('--test_proportion', type=float, default=0.0001, help='seismic data for test')
+        self.parser.add_argument('--test_proportion', type=float, default=0.00001, help='seismic data for test')
 
         # F3dataset configuration 
-        self.parser.add_argument('--root_path', type=str, default='/home/dell/disk1/Jinlong/faciesdata', help='root path of the data file')
+        self.parser.add_argument('--root_path', type=str, default=r'F:\Facies\FaciesData\F3Facies', help='root path of the data file')
         self.parser.add_argument('--data_path', type=str, default='train_seismic.npy', help='data npy file')
         self.parser.add_argument('--label_path', type=str, default='train_labels.npy', help='label npy file')
         self.parser.add_argument('--mask_path', type=str, default='train_labels.npy', help='mask npy file')

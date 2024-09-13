@@ -123,7 +123,7 @@ class Model(nn.Module):
 
     def selftraining(self, x_enc, x_mark_enc, x_mark_enc_binary, embedding_flag, vmd_flag):
        
-        enc_out = self.enc_embedding(x_enc, x_mark_enc, embedding_flag, vmd_flag)B3NzaC1yc2EAAAA
+        enc_out = self.enc_embedding(x_enc, x_mark_enc, embedding_flag, vmd_flag)
         # True to indicates not attend attention, while False attend
         # And actually here the mask is inverse but we change this during the enisum
         # first convert kmeans into bool then into binary

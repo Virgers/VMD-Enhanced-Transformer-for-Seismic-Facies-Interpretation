@@ -13,7 +13,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] ="0"
 # os.environ['CUDA_VISIBLE_DEVICES'] ="1"
 
 def main(config):
-    # we have other tasks, for simplicty only keep classifcation here
+    # We have other tasks, for simplicty only keep classifcation here
     if args.task_name =='classification':
         from exp.exp_classification import Exp_Classification
         Exp = Exp_Classification
@@ -34,17 +34,16 @@ def main(config):
                 f"is-vmd_{args.is_vmd}-"
                 f"embed-flag_{args.embedding_flag}-"
                 f"epochs_{args.train_epochs}-"
-                f"backbone_{args.use_ssl_model}-"
                 f"batchsize_{args.batch_size}-"
                 f"{ii}"
             )
             
             exp = Exp(args)  # set experiments
-            print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+            print('>>>>>>>>>>>>>>>>>>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
             exp.train(setting)
             
-            print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-            exp.test(setting)
+            # print('>>>>>>>>>>>>>>>>>>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+            # exp.test(setting)
 
             # if args.do_predict:
             #     print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
