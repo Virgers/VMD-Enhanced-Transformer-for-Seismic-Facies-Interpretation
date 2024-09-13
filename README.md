@@ -17,7 +17,7 @@ We evalutate the module effectiveness by implementing several cutting-edge time-
 pip install -r requirements.txt
 ```
 
-2. Prepare Data. You can obtain the well pre-processed datasets from [[Google Drive]]() or [[Baidu Drive]](), Then place the downloaded data in the folder`./data_path` and `./label_path` so forth. Here is a summary of supported datasets.
+2. Prepare Data. You can obtain the well pre-processed datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) code: f3fd, Then place the downloaded data in the folder`./data_path` and `./label_path` so forth. Here is a summary of supported datasets.
 
 3. Train and evaluate model. We provide the experiment scripts for all benchmarks under the folder `./scripts/`. You can reproduce the experiment results as the following examples:
 
