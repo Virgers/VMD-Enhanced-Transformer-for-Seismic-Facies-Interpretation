@@ -21,7 +21,9 @@ We present a simple snipet for generating in our case within `./utils/generate_V
 
 ## Usage
 
-1. Install Python 3.8. For convenience, execute the following command. (Not recommend). 
+1. Clone this repository. 
+
+2. Install Python 3.8. For convenience, execute the following command. (Not recommend). 
 
 ```
 pip install -r requirements.txt
