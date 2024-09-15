@@ -1,17 +1,27 @@
 # VMD-Enhanced-Transformer-for-Facies-Interpretation
-We adpat several base models from TSlib to adpat into our classification tasks.
 
-1. We propose **label-integrated embedding** to add very few labels during embedding stage to guide the self-attention stage. Typically, this approach will enhance most time-series transformer model, and it depends on corresponding model embedding structure.
-2. We introduce **VMD-augmented** approach to enlarge the tranining dataset.
+## Introduction
+We adpat several base models from THUML [Time-Series-Library](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) to adpat into our classification tasks with following approaches.
 
-## Module examination
+1. We propose **Label-Integrated Embedding** to add very few labels during embedding stage to guide the self-attention stage. Typically, this approach will enhance most time-series transformer model, and it depends on corresponding model embedding structure. <br><br>
+One can check the Label-Integragted Embedding within ``./layers/Embed.py``. We provide two cases for this approach, one for having VMD the other one for without VMD.<br>
 
-We evalutate the module effectiveness by implementing several cutting-edge time-series transformers. We list the original paper and codes that we use in our paper.
+2. We introduce **VMD-Augmentation** approach to enlarge the tranining dataset. Basically, it decompose the original singals into multiple orthogonal components. The generated modes have more regular structures, which makes the model more easiy to converage.<br><br>
+We present a simple snipet for generating in our case within `./utils/generate_VMD.py`. One can generate their own VMD data by selecting suitable parameters. We provide our vmd data in Baidu Drive.
+
+3. In this project, we evaluate the model performances on two datasets. Therefore, I define two sets data provider for two datasets particularly. Within each data provider, it provides two situations having vmd-assited or not.
+
+
+## Attention
+```
+1. Currently, we only provide the complete code for iTransformer, i.e., one can check the label-integrated embedding` and 'VMD-augmented' in iTransformer case. We'll complete other model cases ASAP.
+2. The paper is coming soon.
+```
 
 
 ## Usage
 
-1. Install Python 3.8. For convenience, execute the following command.
+1. Install Python 3.8. For convenience, execute the following command. (Not recommend). 
 
 ```
 pip install -r requirements.txt
@@ -24,42 +34,15 @@ You can obtain the F3 facies datasets from [[Google Drive]]() or [[Baidu Drive]
 - *Paraihaka facies dataset*
 You can obtain the Newzealand Pariahaka datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1QNjanQDfN3H9JvOpoX_aYw) code: `NZfd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. Here is a summary of supported datasets.
 
-I define two sets data provider for two datasets particularly. Within each data provider, it provides two situations having vmd-assited or not.
+3. To debug. We modify arguments in every the `XXX_options.py` within Options class.
 
-
-3. Train and evaluate model. We provide the experiment scripts for all benchmarks under the folder `./scripts/`. You can reproduce the experiment results as the following examples:
-
-```
-# long-term forecast
-bash ./scripts/long_term_forecast/ETT_script/TimesNet_ETTh1.sh
-# short-term forecast
-bash ./scripts/short_term_forecast/TimesNet_M4.sh
-# imputation
-bash ./scripts/imputation/ETT_script/TimesNet_ETTh1.sh
-# anomaly detection
-bash ./scripts/anomaly_detection/PSM/TimesNet.sh
-# classification
-bash ./scripts/classification/TimesNet.sh
-```
-4. To debug the model. We modify arguments in every the `XXX_options.py` within Options class.
-
-5. Check label-integrated embedding.
-
-- We .
-
-6. Check the VMD-augmented embedding.
 
 ## Citation
 
 If you find this repo useful, please cite our paper.
 
 ```
-@inproceedings{wu2023timesnet,
-  title={TimesNet: Temporal 2D-Variation Modeling for General Time Series Analysis},
-  author={Haixu Wu and Tengge Hu and Yong Liu and Hang Zhou and Jianmin Wang and Mingsheng Long},
-  booktitle={International Conference on Learning Representations},
-  year={2023},
-}
+XXX
 ```
 
 ## Contact
@@ -74,12 +57,6 @@ Or describe it in Issues.
 This library is constructed based on the following repos:
 
 - Time-Series-Library: https://github.com/thuml/Time-Series-Library.
-
-- Forecasting: https://github.com/thuml/Autoformer.
-
-- Anomaly Detection: https://github.com/thuml/Anomaly-Transformer.
-
-- Classification: https://github.com/thuml/Flowformer.
 
 All the experiment datasets are public, and we obtain them from the following links:
 
