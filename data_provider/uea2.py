@@ -23,7 +23,7 @@ def collate_fn(data, max_len=None):
     batch_size = len(data)
     # original inputs has shape of  (seq_length, feat_dim);
     # seismic inputs train_data has shape of 
-    data_all, label_all, padding_masks, attn_masks = zip(*data)
+    data_all, label_all, padding_masks = zip(*data)
    
     # Stack and pad features and masks (convert 2D to 3D tensors, i.e. add batch dimension)
     lengths = [X.shape[0] for X in data_all]  # original sequence length for each time series
@@ -49,11 +49,16 @@ def collate_fn(data, max_len=None):
         
         mask[i, :end, :] = padding_masks[i][:end, :]
 
-    attn_mask = torch.zeros(batch_size, max_len, attn_masks[0].shape[-1])  # (batch_size, padded_length, feat_dim)
-    for i in range(batch_size):
-        end = min(lengths[i], max_len)
-        
-        attn_mask[i, :end, :] = attn_masks[i][:end, :]
+    return X, Y, mask
 
-    return X, Y, mask, attn_mask
-    # return X, Y
+def padding_mask(lengths, max_len=None):
+    """
+    Used to mask padded positions: creates a (batch_size, max_len) boolean mask from a tensor of sequence lengths,
+    where 1 means keep element at this position (time step)
+    """
+    batch_size = lengths.numel()
+    max_len = max_len or lengths.max_val()  # trick works because of overloading of 'or' operator for non-boolean types
+    return (torch.arange(0, max_len, device=lengths.device)
+            .type_as(lengths)
+            .repeat(batch_size, 1)
+            .lt(lengths.unsqueeze(1)))

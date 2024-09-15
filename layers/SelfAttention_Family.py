@@ -46,11 +46,10 @@ class DSAttention(nn.Module):
 
 
 class FullAttention(nn.Module):
-    def __init__(self, is_attn_mask=False, attn_mask_none=False, factor=5, scale=None, attention_dropout=0.1, output_attention=True):
+    def __init__(self, factor=5, scale=None, attention_dropout=0.1, output_attention=True):
         super(FullAttention, self).__init__()
         self.scale = scale
-        self.is_attn_mask = is_attn_mask
-        self.attn_mask_none = attn_mask_none
+        
         self.output_attention = output_attention
         self.dropout = nn.Dropout(attention_dropout) 
 
@@ -62,26 +61,25 @@ class FullAttention(nn.Module):
         # batchsize,len,head,embedding, (batchsize seqlen, head, embedding) --> batchsize head,len,seq_len
         scores = torch.einsum("blhe, bshe->bhls", queries, keys)
 
-        if self.is_attn_mask:
-            if self.attn_mask_none:
-                attn_mask = TriangularCausalMask(B, L, device=queries.device)
-                # true will be masked which is 1  question is that the scores has shape of b 8, seqlen, seqlen four dim
-                # but the mask we have here only has b, 1, seqlen 3 dimension so we unsqueeze the last dimension 
-                # b, 1, seq_len --> b, 1, seqlen, seq_len
-                # attn_mask = attn_mask.transpose(2, 1)
-                # scores.masked_fill_(attn_mask, -np.inf)
-                scores.masked_fill_(attn_mask.mask, -np.inf)
+        
+        attn_mask = TriangularCausalMask(B, L, device=queries.device)
+        # true will be masked which is 1  question is that the scores has shape of b 8, seqlen, seqlen four dim
+        # but the mask we have here only has b, 1, seqlen 3 dimension so we unsqueeze the last dimension 
+        # b, 1, seq_len --> b, 1, seqlen, seq_len
+        # attn_mask = attn_mask.transpose(2, 1)
+        # scores.masked_fill_(attn_mask, -np.inf)
+        scores.masked_fill_(attn_mask.mask, -np.inf)
 
-            else:
-                # I ceate a mask follows the scores typo, in this way, we will make our mask a symmetri one.
-                attn_mask = attn_mask.unsqueeze(-1)
-                p, q, k, j = attn_mask.shape
-                attmaskcopy = attn_mask
-                o, z, h, w = attmaskcopy.shape
-                ein_attn_mask= torch.einsum("pqkj, ozhw->pkqz", attn_mask, attmaskcopy)
-                # ein_attn_mask_reverse = 1 - ein_attn_mask.bool().int()
-                ein_attn_mask_reverse_bool = ein_attn_mask.bool()
-                scores.masked_fill_(ein_attn_mask_reverse_bool, -np.inf)
+            
+        # I ceate a mask follows the scores typo, in this way, we will make our mask a symmetri one.
+        # attn_mask = attn_mask.unsqueeze(-1)
+        # p, q, k, j = attn_mask.shape
+        # attmaskcopy = attn_mask
+        # o, z, h, w = attmaskcopy.shape
+        # ein_attn_mask= torch.einsum("pqkj, ozhw->pkqz", attn_mask, attmaskcopy)
+        # # ein_attn_mask_reverse = 1 - ein_attn_mask.bool().int()
+        # ein_attn_mask_reverse_bool = ein_attn_mask.bool()
+        # scores.masked_fill_(ein_attn_mask_reverse_bool, -np.inf)
 
         # print(torch.squeeze(ein_attn_mask[0]))
         A = self.dropout(torch.softmax(scale * scores, dim=-1))

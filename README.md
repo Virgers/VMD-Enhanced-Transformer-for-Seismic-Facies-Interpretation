@@ -24,6 +24,7 @@ You can obtain the F3 facies datasets from [[Google Drive]]() or [[Baidu Drive]
 - *Paraihaka facies dataset*
 You can obtain the Newzealand Pariahaka datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1QNjanQDfN3H9JvOpoX_aYw) code: `NZfd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. Here is a summary of supported datasets.
 
+I define two sets data provider for two datasets particularly. Within each data provider, it provides two situations having vmd-assited or not.
 
 
 3. Train and evaluate model. We provide the experiment scripts for all benchmarks under the folder `./scripts/`. You can reproduce the experiment results as the following examples:

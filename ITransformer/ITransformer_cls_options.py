@@ -34,46 +34,44 @@ class Options(object):
                                  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
         # self.parser.add_argument('--output_dir', default='/home/dell/disk1/Jinlong/Time-Series-Library-main/output', 
                                 #  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
-        self.parser.add_argument('--dataset', type=str, default='f3')
-        self.parser.add_argument('--is_training', type=int,  default=1, help='status')
-        self.parser.add_argument('--is_pre_training', type=int,  default=0, help='status')
-        self.parser.add_argument('--is_self_supervised', type=int,  default=0, help='status')
+        self.parser.add_argument('--dataset', type=str, default='f3') # or others like nz
+        self.parser.add_argument('--is_training', type=int,  default=1, help='status')       
         self.parser.add_argument('--is_testing', type=int,  default=0, help='status')
         self.parser.add_argument('--task_name', type=str, default='classification')
         self.parser.add_argument('--model', type=str,  default='iTransformer',
                             help='model name, options: [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer, BiLSTM]')
-        self.parser.add_argument('--batch_size', type=int, default=16, help='batch size of train input data')
+        self.parser.add_argument('--batch_size', type=int, default=2, help='batch size of train input data')
         self.parser.add_argument('--val_proportion', type=float, default=0.00001, help='seismic data for test')
-        self.parser.add_argument('--train_proportion', type=float, default=0.00001, help='seismic data for train')
+        self.parser.add_argument('--train_proportion', type=float, default=0.0001, help='seismic data for train')
         self.parser.add_argument('--test_proportion', type=float, default=0.00001, help='seismic data for test')
 
-        # F3dataset configuration 
-        self.parser.add_argument('--root_path', type=str, default=r'F:\Facies\FaciesData\F3Facies', help='root path of the data file')
+        # F3dataset configuration   
+        self.parser.add_argument('--root_path', type=str, default=r'F:\Facies\FaciesData\F3Facies\train', help='root path of the data file')
         self.parser.add_argument('--data_path', type=str, default='train_seismic.npy', help='data npy file')
         self.parser.add_argument('--label_path', type=str, default='train_labels.npy', help='label npy file')
         self.parser.add_argument('--mask_path', type=str, default='train_labels.npy', help='mask npy file')
+        self.parser.add_argument('--train_epochs', type=int, default=10, help='train epochs')
+
+        self.parser.add_argument('--vmd_data_path', type=str, default='full_F3_vmd.npy', help='vmd npy data file') 
+        self.parser.add_argument('--is_vmd', type=bool, default=True , help='whether using the vmd')
+        self.parser.add_argument('--embedding_flag', type=bool, default=True, help='if set true model apply padding mask as attn mask')
+        self.parser.add_argument('--mask_rate', type=int, default=0.125, help='mask rate below is masked')
         
         # Parihaka dataset configuration
-        # self.parser.add_argument('--root_path', type=str, default='/home/dell/disk1/Jinlong/faciesdata', help='root path of the data file')
-        # self.parser.add_argument('--data_path', type=str, default='data_train.npz', help='data npy file')
-        # self.parser.add_argument('--label_path', type=str, default='labels_train.npz', help='label npy file')
-        # self.parser.add_argument('--mask_path', type=str, default='labels_train.np
-        # z', help='mask npy file')
+        # self.parser.add_argument('--root_path', type=str, default=r'F:\Facies\FaciesData\NewZealand', help='root path of the data file')
+        # self.parser.add_argument('--data_path', type=str, default='data_train.npz', help='data npz file')
+        # self.parser.add_argument('--label_path', type=str, default='labels_train.npz', help='label npz file')
+        # self.parser.add_argument('--mask_path', type=str, default='labels_train.npz', help='mask npz file')
 
         self.parser.add_argument('--gpu', type=int, default=0, help='gpu')
-        self.parser.add_argument('--vmd_data_path', type=str, default='full_F3_vmd.npy', help='vmd npy data file') 
-        self.parser.add_argument('--is_vmd', type=bool, default=False , help='whether using the vmd')
-        self.parser.add_argument('--train_epochs', type=int, default=1, help='train epochs')
-        self.parser.add_argument('--embedding_flag', type=bool, default=False, help='if set true model apply padding mask as attn mask')
-        self.parser.add_argument('--mask_rate', type=int, default=0.125, help='mask rate below is masked')
 
-        self.parser.add_argument('--checkpoints_test_only', type=str, default='/home/dell/disk1/Jinlong/Time-Series-Library-main/checkpoints/2024-06-13 12:26:26-iTransformer-trainproportion_0.01-testproportion_0.01-maskrate_0.125-isvmd_False-embedflag_False-epochs_14-backbone_False-batchsize_16-0/checkpoint.pth', help='location of model checkpoints')
+        self.parser.add_argument('--checkpoints_test_only', type=str, default=r'F:\VMD-Enhanced-Transformer-for-Facies-Interpretation\checkpoint\20240914_1028_iTransformer_f3_0.00_0.00_0.12_False_False_1_16\checkpoint.pth', help='location of model checkpoints')
 
         self.parser.add_argument('--model_id', type=str,  default='train', help='model id')
         # data loader
         self.parser.add_argument('--data', type=str, default='TSF', help='dataset type')
 
-        self.parser.add_argument('--attn_mask_path', type=str, default='labels.npy', help='mask npy file')
+        self.parser.add_argument('--attn_mask_path', type=str, default='train_labels.npy', help='mask npy file')
 
         self.parser.add_argument('--is_attn_mask', type=bool, default=False, help='if set true model apply padding mask as attn mask')
         self.parser.add_argument('--att_mask_none', type=bool, default=True, help='if set true model apply padding mask as attn mask')
@@ -92,7 +90,7 @@ class Options(object):
         # OT is the dataset last column represents the label
         self.parser.add_argument('--freq', type=str, default='h',
                             help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
-        self.parser.add_argument('--checkpoints', type=str, default='./checkpoints', help='location of model checkpoints')
+        self.parser.add_argument('--checkpoints', type=str, default=r'F:\VMD-Enhanced-Transformer-for-Facies-Interpretation\checkpoint', help='location of model checkpoints')
 
         # forecasting task
         self.parser.add_argument('--seq_len', type=int, default=255, help='input sequence length')
@@ -122,7 +120,7 @@ class Options(object):
         self.parser.add_argument('--activation', type=str, default='gelu', help='activation')
         self.parser.add_argument('--output_attention', type=bool,default=True, help='whether to output attention in ecoder')
         # optimization
-        self.parser.add_argument('--num_workers', type=int, default=1, help='data loader num workers')
+        self.parser.add_argument('--num_workers', type=int, default=0, help='data loader num workers')
         self.parser.add_argument('--itr', type=int, default=1, help='experiments times')
         self.parser.add_argument('--patience', type=int, default=10, help='early stopping patience')
         self.parser.add_argument('--learning_rate', type=float, default=0.01, help='optimizer learning rate')
@@ -159,9 +157,9 @@ class Options(object):
             args.device_ids = [int(id_) for id_ in device_ids]
             args.gpu = args.device_ids[0]
 
-        print('Args in experiment:')
-        print(args)
-
+        # Print all the args
+        # print('Args in experiment:')
+        # print(args)
         
         return args
 

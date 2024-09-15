@@ -1,6 +1,3 @@
-from data_provider.datafactory import data_provider
-# from data_provider.datafactory2 import data_provider
-
 import os
 import pdb
 import time
@@ -12,18 +9,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import optim
 
-
 from exp.exp_basic import Exp_Basic
 from utils.tools import EarlyStopping, adjust_learning_rate
-
 
 warnings.filterwarnings('ignore')
 
    
 class Exp_Classification(Exp_Basic):
-
+   
     def __init__(self, args):
         super(Exp_Classification, self).__init__(args)
+       
 
     def _build_model(self):
 
@@ -37,11 +33,15 @@ class Exp_Classification(Exp_Basic):
         model.projection = cls_projection
 
         return model
-
         
-    def _get_data(self, flag, is_vmd):
+    def _get_data(self, flag, is_vmd, dataset):
         # It may take a period of time to load VMD data
-        print('----------Get_data_now!----------------')
+         
+        if dataset=='f3':
+            from data_provider.datafactory import data_provider
+        else:
+            from data_provider.datafactory2 import data_provider
+
         data_set, data_loader = data_provider(self.args, is_vmd, flag)
 
         return data_set, data_loader
@@ -62,9 +62,9 @@ class Exp_Classification(Exp_Basic):
         total_samples = 0
         total_correct = 0
 
-        print('---------------Get validation dataset----------')
+        # print('---------------Get validation dataset----------')
 
-        _, vali_loader = self._get_data(is_vmd=self.args.is_vmd, flag='val')
+        _, vali_loader = self._get_data(is_vmd=self.args.is_vmd, flag='val',dataset=self.args.dataset)
 
         print('---------------Get validation dataset done---------')
 
@@ -72,12 +72,12 @@ class Exp_Classification(Exp_Basic):
 
         with torch.no_grad():
             
-            for i, (batch_x, label, padding_mask, x_mark_enc_binary) in enumerate(vali_loader):
+            for i, (batch_x, label, padding_mask) in enumerate(vali_loader):
                 batch_x = batch_x.float().to(self.device)
                 padding_mask = padding_mask.float().to(self.device)
                 label = label.to(self.device)
-                x_mark_enc_binary = x_mark_enc_binary.to(self.device)
-                outputs, _ = self.model(batch_x, padding_mask, x_mark_enc_binary, None, None)
+                
+                outputs, _ = self.model(batch_x, padding_mask)
 
                 pred = outputs.detach().cpu()
                 loss = criterion(pred, label.long().cpu())
@@ -97,13 +97,14 @@ class Exp_Classification(Exp_Basic):
 
     def train(self, setting):
 
-        print('---------------Prepare train dataset---------------')
+        # print('---------------Prepare train dataset---------------')
 
-        _, train_loader = self._get_data(is_vmd=self.args.is_vmd, flag='train')
+        _, train_loader = self._get_data(is_vmd=self.args.is_vmd, flag='train', dataset=self.args.dataset)
 
-        print('---------------Get train dataset done!---------------')
+        print('---------------Get train dataset done---------------')
 
-        path = os.path.join(self.args.checkpoints, setting)
+        dir_name = "_".join([f"{v}" for v in setting.values()])
+        path = os.path.join(self.args.checkpoints, dir_name)
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -122,7 +123,7 @@ class Exp_Classification(Exp_Basic):
             self.model.train()
             epoch_time = time.time()
 
-            for i, (batch_x, label, padding_mask, x_mark_enc_binary) in enumerate(train_loader):
+            for i, (batch_x, label, padding_mask) in enumerate(train_loader):
 
                 iter_count += 1
 
@@ -131,8 +132,8 @@ class Exp_Classification(Exp_Basic):
                 batch_x = batch_x.float().to(self.device)
                 padding_mask = padding_mask.float().to(self.device)
                 label = label.to(self.device)
-                x_mark_enc_binary = x_mark_enc_binary.to(self.device)
-                outputs, attns = self.model(batch_x, padding_mask, x_mark_enc_binary, None, None)
+                
+                outputs, attns = self.model(batch_x, padding_mask)
                 loss = criterion(outputs, label.long())
                 loss.backward()
                 model_optim.step()
@@ -149,16 +150,18 @@ class Exp_Classification(Exp_Basic):
             if self.args.model !='FEDformer' and self.args.model !='Pyraformer':
                 attns = attns[0].cpu().detach().numpy() 
             
-            print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
+            print("Epoch: {} cost time: {:.4f}".format(epoch + 1, time.time() - epoch_time))
 
             train_loss.append(loss.item())
             train_loss = np.average(train_loss)
 
-            print('---------------Start validation---------------')
+            formatted_setting = ' | '.join([f"{k}:{v}" for k, v in setting.items()])
+            print('>>Start validation : {}>>'.format(formatted_setting))
+            
             vali_loss, val_accuracy = self.vali(criterion)
             
             print(
-                "Epoch: {0}, Steps: {1} | Train Loss: {2:.3f} Vali Loss: {3:.3f} Vali Acc: {4:.3f}"
+                "Epoch: {0}, Steps: {1} | Train Loss: {2:.3f} | Vali Loss: {3:.3f} | Vali Acc: {4:.3f}"
                 .format(epoch + 1, train_steps, train_loss, vali_loss, val_accuracy))
 
             early_stopping(-val_accuracy, self.model, path, attns)
@@ -170,34 +173,36 @@ class Exp_Classification(Exp_Basic):
                 adjust_learning_rate(model_optim, epoch + 1, self.args)
 
         best_model_path = path + '/' + 'checkpoint.pth'
-        self.model.load_state_dict(torch.load(best_model_path), map_location=torch.device('cuda:1' if torch.cuda.is_available() else 'cpu'))
+        # self.model.load_state_dict(torch.load(best_model_path), map_location=torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'))
+        self.model.load_state_dict(torch.load(best_model_path))
 
         return self.model
 
 
     def test(self, setting, test=1):
 
-        print('---------------Prepare test dataset---------------')
+        # print('---------------Prepare test dataset---------------')
 
-        _, test_loader = self._get_data(is_vmd=self.args.is_vmd, flag='test')
+        _, test_loader = self._get_data(is_vmd=self.args.is_vmd, flag='test', dataset=self.args.dataset)
 
         print('---------------Get test dataset done!---------------')
 
 
-        print('---------------Loading model---------------')
+        print('---------------Loading model------------------------')
 
-        if self.args.is_training:
-             self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
-        else:
-            self.model.load_state_dict(torch.load(self.args.checkpoints_test_only))
+        self.model.load_state_dict(torch.load(self.args.checkpoints_test_only))
 
-        print('---------------Load successfully!---------------')
+        print('---------------Load successfully!-------------------')
 
         accuracy = 0
-       
-        folder_path = './test_results/' + setting + '/'
+
+        dir_name = "_".join([f"{v}" for v in setting.values()])
+        folder_path = os.path.join('test_results', dir_name)
+
+        # folder_path = './test_results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
+
         pred_label_all = None
         self.model.eval()
         num_classes = 6
@@ -207,14 +212,13 @@ class Exp_Classification(Exp_Basic):
         predict_num = torch.zeros((1, num_classes)) 
 
         with torch.no_grad():
-            for i, (batch_x, label, padding_mask, x_mark_enc_binary) in enumerate(test_loader):
+            for i, (batch_x, label, padding_mask) in enumerate(test_loader):
             
                 batch_x = batch_x.float().to(self.device)
                 padding_mask = padding_mask.float().to(self.device)
                 label = label.to(self.device)
-                x_mark_enc_binary = x_mark_enc_binary.to(self.device)
-
-                outputs, _ = self.model(batch_x, padding_mask, x_mark_enc_binary, None, None)
+                
+                outputs, _ = self.model(batch_x, padding_mask)
                 pred = outputs.detach().cpu()
                 probs = torch.nn.functional.softmax(pred)  # (total_samples, num_classes) est. prob. for each class and sample
                 predictions = torch.argmax(probs, dim=1) # (total_samples,) int class index for each sample
@@ -233,27 +237,20 @@ class Exp_Classification(Exp_Basic):
                 target_num += tar_mask.sum(0)
                 acc_mask = pre_mask * tar_mask
                 acc_num += acc_mask.sum(0)
-
-
-        folder_path = './results/' + setting + '/'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
         
         recall = acc_num / target_num
         precision = acc_num / predict_num + float('1e-8')
         F1 = 2 * recall * precision / (recall + precision)
         accuracy = 100. * acc_num.sum(1) / target_num.sum(1)
         
-        print('accuracy:{}'.format(accuracy))
         print('Test Acc {}'.format(accuracy))
         print('recall {}'.format(recall))
         print('precision {}'.format(precision))
         print('F1-score {}'.format(F1))
 
-        file_name='result_classification.txt'
+        txt_file_name = 'cls_result.txt'
 
-        f = open(os.path.join(folder_path,file_name), 'a')
-        f.write(setting + "  \n")
+        f = open(os.path.join(folder_path, txt_file_name), 'a')
         f.write('accuracy:{}'.format(accuracy))
         f.write('\n')
         f.write('recall:{}'.format(recall))
@@ -261,10 +258,12 @@ class Exp_Classification(Exp_Basic):
         f.write('precision:{}'.format(precision))
         f.write('\n')
         f.write('F1:{}'.format(F1))
-
         f.write('\n')
         f.close()
-        np.save(os.path.join(folder_path, 'seismic_nz_itransformer_null_facies.npy'), pred_label_all)
-        print('Predicted results saved!:)')
+        
+        npyfile_name = 'cls_result.npy'
+        np.save(os.path.join(folder_path, npyfile_name), pred_label_all)
+        print('---------------Predicted results saved :)-----------')
+        
 
         return

@@ -146,10 +146,6 @@ class DataEmbedding(nn.Module):
 
     def forward(self, x, x_mark, embedding_flag, vmd_flag):
         if not embedding_flag:
-            # 其实这个条件可以不存在了，
-            # x 32, 255, 1 B H W  value embedding --> [32, 255, 64] 
-            # x 32, 255, 5 --> [32, 255, 64]
-            # positional ([1, 255, 64]
             
             if vmd_flag:
                 x = self.value_embedding_vmd(x) + self.position_embedding(x)
