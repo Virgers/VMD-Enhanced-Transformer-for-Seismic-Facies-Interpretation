@@ -31,10 +31,10 @@ pip install -r requirements.txt
 
 2. Prepare Data. 
 - *F3 facies dataset*
-You can obtain the F3 facies datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) code: `f3fd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. Here is a summary of supported datasets.
+You can obtain the F3 facies datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) code: `f3fd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. We also include the corresponding VMD data.
 
 - *Paraihaka facies dataset*
-You can obtain the Newzealand Pariahaka datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1QNjanQDfN3H9JvOpoX_aYw) code: `NZfd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. Here is a summary of supported datasets.
+You can obtain the Newzealand Pariahaka datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1QNjanQDfN3H9JvOpoX_aYw) code: `NZfd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. 
 
 3. To debug. We modify arguments in every the `XXX_options.py` within Options class.
 
