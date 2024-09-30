@@ -11,6 +11,7 @@ We present a simple snipet for generating in our case within `./utils/generate_V
 
 3. In this project, we evaluate the model performances on two datasets. Therefore, I define two sets data provider for two datasets particularly. Within each data provider, it provides two situations having vmd-assited or not.
 
+4. We also testify the pre-training model effectiveness on down-streaming tasks with different masks and masking data volume. You can find the ssl parts in this project.
 
 ## Attention
 ```

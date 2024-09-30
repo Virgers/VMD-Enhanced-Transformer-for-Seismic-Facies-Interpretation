@@ -11,9 +11,9 @@ os.environ['CUDA_VISIBLE_DEVICES'] ="0"
 
 def main(config):
     # We have other tasks, for simplicty only keep classifcation here
-    if args.task_name =='classification':
-        from exp.exp_classification import Exp_Classification
-        Exp = Exp_Classification
+    
+    from exp.exp_classification import Exp_Classification
+    Exp = Exp_Classification
 
     now = datetime.datetime.now()
     formatted_date_time = now.strftime("%Y%m%d_%H%M")
