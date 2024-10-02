@@ -1,6 +1,6 @@
-from ssl_dataloader import TSF_custom
+from data_provider.ssl_dataloader import TSF_custom
 
-from ssl_uea import collate_fn
+from data_provider.ssl_uea import collate_fn
 from torch.utils.data import DataLoader
 
 data_dict = {
@@ -47,6 +47,6 @@ def data_provider(args, flag):
         drop_last=drop_last,
         collate_fn=lambda x: collate_fn(x, max_len=args.seq_len)
     )
-    
+
     return data_set, data_loader
     
