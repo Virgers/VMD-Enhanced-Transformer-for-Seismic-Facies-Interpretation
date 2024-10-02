@@ -134,6 +134,7 @@ class Exp_Classification(Exp_Basic):
                 label = label.to(self.device)
                 
                 outputs, attns = self.model(batch_x, padding_mask)
+                
                 loss = criterion(outputs, label.long())
                 loss.backward()
                 model_optim.step()
