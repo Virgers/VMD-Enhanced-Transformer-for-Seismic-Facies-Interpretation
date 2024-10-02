@@ -30,13 +30,13 @@ class Options(object):
         self.parser = argparse.ArgumentParser(description='TimesNet')
         self.parser.add_argument('--config', dest='config_filepath',
                                  help='Configuration .json file (optional). Overwrites existing command-line args!')
-        self.parser.add_argument('--output_dir', default=r'F:\test', 
+        self.parser.add_argument('--output_dir', default=r'F:\VMD-Enhanced-Transformer-for-Facies-Interpretation\test_output', 
                                  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
-        # self.parser.add_argument('--data', type=str, default='custom')
-        self.parser.add_argument('--is_training', type=int,  default=0, help='status')
+        
+        self.parser.add_argument('--dataset', type=str, default='f3') # or others like nz
+        self.parser.add_argument('--is_training', type=int,  default=1, help='status')
         self.parser.add_argument('--is_testing', type=int,  default=0, help='status')
         self.parser.add_argument('--task_name', type=str, default='ssl')
-        
         self.parser.add_argument('--model', type=str,  default='iTransformer',
                             help='model name, options: [iTransformer, iInformer, iReformer, iFlowformer, iFlashformer, BiLSTM]')
         
@@ -48,10 +48,11 @@ class Options(object):
         self.parser.add_argument('--label_path', type=str, default='train_labels.npy', help='label npy file')
         self.parser.add_argument('--mask_path', type=str, default='f3_binary_mask.npy', help='mask npy file')
         
-        self.parser.add_argument('--embedding_flag', type=bool, default=False, help='if set true model apply padding mask as attn mask')
         self.parser.add_argument('--train_proportion', type=float, default=0.001, help='seismic data for train')
         self.parser.add_argument('--mask_rate', type=int, default=0.375, help='mask rate below is masked')
-        self.parser.add_argument('--mask_type', type=str, default='random', help='random generated mask, composite')
+        self.parser.add_argument('--mask_type', type=str, default='composite', help='random, composite')
+        self.parser.add_argument('--is_vmd', type=bool, default=False , help='whether using the vmd')
+        self.parser.add_argument('--embedding_flag', type=bool, default=False, help='if set true model apply padding mask as attn mask')
 
         self.parser.add_argument('--test_proportion', type=float, default=0.1, help='seismic data for test')
         self.parser.add_argument('--val_proportion', type=float, default=0.001, help='seismic data for test')
@@ -104,7 +105,7 @@ class Options(object):
         self.parser.add_argument('--activation', type=str, default='gelu', help='activation')
         self.parser.add_argument('--output_attention', type=bool,default=True, help='whether to output attention in ecoder')
         # optimization
-        self.parser.add_argument('--num_workers', type=int, default=1, help='data loader num workers')
+        self.parser.add_argument('--num_workers', type=int, default=0, help='data loader num workers')
         self.parser.add_argument('--itr', type=int, default=1, help='experiments times')
         
         self.parser.add_argument('--patience', type=int, default=10, help='early stopping patience')
