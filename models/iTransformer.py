@@ -56,6 +56,8 @@ class Model(nn.Module):
             # self.projection = nn.Linear(configs.d_model * configs.enc_in,  configs.num_class)
             # if  configs.is_self_supervised:
             #     self.projection = nn.Linear(configs.d_model * configs.enc_in,  1)
+        if self.task_name == 'ssl':
+            self.projection = nn.Linear(configs.d_model, configs.seq_len, bias=True)
 
     def classification(self, x_enc, x_mark_enc, embedding_flag, vmd_flag):
         # Embedding
@@ -77,11 +79,36 @@ class Model(nn.Module):
         # output = output.reshape(output.shape[0], -1,  1006, 1)
 
         return output, attns
-        
+    
+    def ssl(self, x_enc, x_mark_enc, embedding_flag, vmd_flag):
+
+        # Normalization from Non-stationary Transformer
+        means = x_enc.mean(1, keepdim=True).detach()
+        x_enc = x_enc - means
+        stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
+        x_enc /= stdev
+        _, L, N = x_enc.shape
+
+        # Embedding
+        enc_out = self.enc_embedding(x_enc, x_mark_enc, embedding_flag, vmd_flag)
+        enc_out, attns = self.encoder(enc_out, attn_mask=None)
+
+        # projection = nn.Linear(self.d_model, self.seq_len, bias=True)
+        dec_out = self.projection(enc_out).permute(0, 2, 1)[:, :, :N]
+        # De-Normalization from Non-stationary Transformer
+        dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, L, 1))
+        dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, L, 1))
+
+        return dec_out    
+    
     def forward(self, x_enc, x_mark_enc):
         
         if self.task_name == 'classification':
             dec_out, attns  = self.classification(x_enc, x_mark_enc,self.embedding_flag, self.vmd_flag)
             return dec_out, attns  # [B, N]
+        
+        if self.task_name == 'ssl':
+            dec_out = self.ssl(x_enc, x_mark_enc, self.embedding_flag, self.vmd_flag)
+            return dec_out
         return None
 
