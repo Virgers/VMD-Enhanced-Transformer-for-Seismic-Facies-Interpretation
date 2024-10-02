@@ -59,7 +59,7 @@ class Exp_ssl(Exp_Basic):
                 mask[mask > self.args.mask_rate] = 1  # remained
                 inp = batch_x.masked_fill(mask == 0, 0)
 
-                outputs = self.model(inp, batch_x_mark, None, None, mask)
+                outputs = self.model(inp, batch_x_mark)
 
                 f_dim = -1 if self.args.features == 'MS' else 0
                 outputs = outputs[:, :, f_dim:]
@@ -76,10 +76,14 @@ class Exp_ssl(Exp_Basic):
 
 
     def train(self, setting):
-        train_data, train_loader = self._get_data(flag='train')
-        vali_data, vali_loader = self._get_data(flag='val')
+        _, train_loader = self._get_data(flag='train')
+        _, vali_loader = self._get_data(flag='val')
       
-        path = os.path.join(self.args.checkpoints, setting)
+        # path = os.path.join(self.args.checkpoints, setting)
+
+        dir_name = "_".join([f"{v}" for v in setting.values()])
+        path = os.path.join(self.args.checkpoints, dir_name)
+
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -87,7 +91,7 @@ class Exp_ssl(Exp_Basic):
 
         train_steps = len(train_loader)
         
-        early_stopping = selfEarlyStopping(patience=self.args.patience, verbose=True)
+        self_early_stopping = selfEarlyStopping(patience=self.args.patience, verbose=True)
 
         model_optim = self._select_optimizer()
         criterion = self._select_criterion()
@@ -99,7 +103,8 @@ class Exp_ssl(Exp_Basic):
         # Calculate FLOPs
         sample_input = next(iter(train_loader))[0].float().to(self.device)  # Take a sample input
         sample_mask = torch.rand_like(sample_input).to(self.device)
-        flops, params = profile(self.model, inputs=(sample_input, sample_input, None, None, sample_mask), verbose=False)
+        flops, params = profile(self.model, inputs=(sample_input, sample_mask), verbose=False)
+
         print(f"Total FLOPs: {flops}")
 
         total_epoch_duration = 0
@@ -124,19 +129,20 @@ class Exp_ssl(Exp_Basic):
                 mask[mask > self.args.mask_rate] = 1  # remained
 
                 # using the random mask to generate inp
-                if self.args.mask_type == 'random':
-                  inp = batch_x.masked_fill(mask == 0, 0)
+                # if self.args.mask_type == 'random':
+                #   inp = batch_x.masked_fill(mask == 0, 0)
 
-                # using composite mask
-                # if self.args.mask_type == 'composite':
-                #     composite_mask = mask * batch_x_mark
-                #     inp = batch_x.masked_fill(composite_mask == 0, 0)
+                # The results I found are the two masks below are not suitable
+                # using composite mask 
+                if self.args.mask_type == 'composite':
+                    composite_mask = mask * batch_x_mark
+                    inp = batch_x.masked_fill(composite_mask == 0, 0)
                 
                 # # using the intended mask solely
                 # if self.args.mask_type == 'intended':
                 #     inp = batch_x.masked_fill(batch_x_mark == 0, 0)
 
-                outputs = self.model(inp, batch_x_mark, None, None, mask)
+                outputs = self.model(inp, batch_x_mark)
 
                 f_dim = -1 if self.args.features == 'MS' else 0
                 outputs = outputs[:, :, f_dim:]
@@ -165,8 +171,8 @@ class Exp_ssl(Exp_Basic):
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss))
-            early_stopping(vali_loss, self.model, path)
-            if early_stopping.early_stop:
+            self_early_stopping(vali_loss, self.model, path)
+            if self_early_stopping.early_stop:
                 print("Early stopping")
                 break
             adjust_learning_rate(model_optim, epoch + 1, self.args)
@@ -208,7 +214,7 @@ class Exp_ssl(Exp_Basic):
                 inp = batch_x.masked_fill(mask == 0, 0)
                
                 # imputation
-                outputs = self.model(inp, batch_x_mark, None, None, mask)
+                outputs = self.model(inp, batch_x_mark)
 
                 # eval
                 f_dim = -1 if self.args.features == 'MS' else 0
