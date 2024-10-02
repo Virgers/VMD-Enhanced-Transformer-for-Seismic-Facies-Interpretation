@@ -30,7 +30,7 @@ class Options(object):
         self.parser = argparse.ArgumentParser(description='TimesNet')
         self.parser.add_argument('--config', dest='config_filepath',
                                  help='Configuration .json file (optional). Overwrites existing command-line args!')
-        self.parser.add_argument('--output_dir', default=r'F:\test', 
+        self.parser.add_argument('--output_dir', default=r'F:\VMD-Enhanced-Transformer-for-Facies-Interpretation\test_output', 
                                  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
         # self.parser.add_argument('--output_dir', default='/home/dell/disk1/Jinlong/Time-Series-Library-main/output', 
                                 #  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
