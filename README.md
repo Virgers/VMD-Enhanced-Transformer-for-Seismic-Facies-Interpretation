@@ -13,12 +13,6 @@ We present a simple snipet for generating in our case within `./utils/generate_V
 
 4. We also testify the pre-training model effectiveness on down-streaming tasks with different masks and masking data volume. You can find the ssl parts in this project.
 
-## Attention
-```
-1. Currently, we only provide the complete code for iTransformer, i.e., one can check the label-integrated embedding` and 'VMD-augmented' in iTransformer case. We'll complete other model cases ASAP.
-2. The paper is coming soon.
-```
-
 
 ## Usage
 
@@ -26,19 +20,25 @@ We present a simple snipet for generating in our case within `./utils/generate_V
 
 2. Install Python 3.8. For convenience, execute the following command. (Not recommend). 
 
-```
-pip install -r requirements.txt
-```
+    ```pip install -r requirements.txt```
 
-2. Prepare Data. 
+
+3. Prepare Data. 
 - *F3 facies dataset*
 You can obtain the F3 facies datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) code: `f3fd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. We also include the corresponding VMD data.
 
 - *Paraihaka facies dataset*
 You can obtain the Newzealand Pariahaka datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1QNjanQDfN3H9JvOpoX_aYw) code: `NZfd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. 
 
-3. To debug. We modify arguments in every the `XXX_options.py` within Options class.
+4. To debug. We modify arguments in every the `XXX_options.py` within Options class.
 
+5. To explore the ssl, one can refer to `/utils/model_selecting_strategy`, and related code files with `ssl` in their names.
+
+## Attention
+```
+1. Currently, we only provide the complete code for iTransformer, i.e., one can check the label-integrated embedding` and 'VMD-augmented' in iTransformer case. We'll complete other model cases ASAP.
+2. The paper is coming soon.
+```
 
 ## Citation
 
