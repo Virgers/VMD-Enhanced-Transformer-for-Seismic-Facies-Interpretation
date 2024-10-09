@@ -1,5 +1,14 @@
 # VMD-Enhanced-Transformer-for-Facies-Interpretation
 
+## Table of Contents
+- [Introduction](#introduction)
+- [Key Features](#key-features)
+- [Usage](#usage)
+- [Attention](#attention)
+- [Citation](#citation)
+- [Contact](#contact)
+- [Acknowledgement](#acknowledgement)
+
 ## Introduction
 We adpat several base models from THUML [Time-Series-Library](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) to adpat into our classification tasks with following approaches.
 
