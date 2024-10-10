@@ -62,7 +62,7 @@ If you find this repo useful, please cite our paper.
 
 
 ## Contact
-If you have any questions or suggestions, feel free to contact: [Jinlong Huojinlong.huo99@gmail.com] Or describe it in Issues.
+If you have any questions or suggestions, feel free to contact: `Jinlong Huo` <u>[jinlong.huo99@gmail.com]</u> Or describe it in Issues.
 
 ## Acknowledgement
 
