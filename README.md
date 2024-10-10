@@ -22,6 +22,10 @@ We present a simple snipet for generating in our case within `./utils/generate_V
 
 4. We also testify the pre-training model effectiveness on down-streaming tasks with different masks and masking data volume. You can find the ssl parts in this project.
 
+## Key Features
+1. Introduce time series transformer to facies classification.
+2. Introduce VMD-augmentation to process seismic data.
+3. Introduce label-integrated embedding to time series transformer.
 
 ## Usage
 
@@ -34,43 +38,39 @@ We present a simple snipet for generating in our case within `./utils/generate_V
 
 3. Prepare Data. 
 - *F3 facies dataset*
-You can obtain the F3 facies datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) code: `f3fd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. We also include the corresponding VMD data.
+You can obtain the F3 facies datasets from [[Google Drive]](https://drive.google.com/drive/folders/124tphRV1eEtpxTiRSj6eE41xg2kgd7PW?usp=drive_link) or [[Baidu Drive]](https://pan.baidu.com/s/1wydQRBNdyylJZAvxCMjOPA) code: `f3fd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. We also include the corresponding VMD data.
 
 - *Paraihaka facies dataset*
-You can obtain the Newzealand Pariahaka datasets from [[Google Drive]]() or [[Baidu Drive]](https://pan.baidu.com/s/1QNjanQDfN3H9JvOpoX_aYw) code: `NZfd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. 
+You can obtain the Newzealand Pariahaka datasets from [[Google Drive]](https://drive.google.com/drive/folders/1AgxeoEeFYI0lC3cLWtXw3VyvAHoa2xTh?usp=drive_link) or [[Baidu Drive]](https://pan.baidu.com/s/1QNjanQDfN3H9JvOpoX_aYw) code: `NZfd`, Then place the downloaded data in the folder `./root_path` with `./data_path` and `./label_path` so forth. 
 
 4. To debug. We modify arguments in every the `XXX_options.py` within Options class.
 
 5. To explore the ssl, one can refer to `/utils/model_selecting_strategy`, and related code files with `ssl` in their names.
 
 ## Attention
-```
+
 1. Currently, we only provide the complete code for iTransformer, i.e., one can check the label-integrated embedding` and 'VMD-augmented' in iTransformer case. We'll complete other model cases ASAP.
-2. The paper is coming soon.
-```
+
+2. The paper can be early [accessed](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10707629).
+
+
 
 ## Citation
 
 If you find this repo useful, please cite our paper.
+[Seismic Facies Classification Using Label-Integrated and VMD-Augmented Transformer](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=10707629)
 
-```
-XXX
-```
 
 ## Contact
-If you have any questions or suggestions, feel free to contact:
-
-- Jinlong Huo (jinlong.huo99@gmail.com)
-
-Or describe it in Issues.
+If you have any questions or suggestions, feel free to contact: [Jinlong Huo](jinlong.huo99@gmail.com) Or describe it in Issues.
 
 ## Acknowledgement
 
 This library is constructed based on the following repos:
 
-- Time-Series-Library: https://github.com/thuml/Time-Series-Library.
+- [Time-Series-Library](https://github.com/thuml/Time-Series-Library)
 
 All the experiment datasets are public, and we obtain them from the following links:
 
-- F3 facies dataset: https://github.com/yalaudah/facies_classification_benchmark.
-- New Zealand Parihaka dataset: https://www.aicrowd.com/challenges/seismic-facies-identification-challenge. 
+- [F3 facies dataset](https://github.com/yalaudah/facies_classification_benchmark.)
+- [New Zealand Parihaka dataset](https://www.aicrowd.com/challenges/seismic-facies-identification-challenge)
