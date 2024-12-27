@@ -10,7 +10,7 @@ And we published our paper at [IEEE TGRS](https://ieeexplore.ieee.org/stamp/stam
 1. We propose **Label-Integrated Embedding** to add very few labels during embedding stage to guide the self-attention stage. Typically, this approach will enhance most time-series transformer model, and it depends on corresponding model embedding structure. <br><br>
    One can check the Label-Integragted Embedding within ``./layers/Embed.py``. We provide two cases for this approach, one for having VMD the other one for without VMD.<br>
 
-2. We introduce **VMD-Augmentation** approach to enlarge the tranining dataset. Basically, it decompose the original singals into multiple orthogonal components. The generated modes have more regular structures, which makes the model more easiy to converage.<br><br>
+2. We introduce **VMD-Augmentation** approach to enlarge the tranining dataset. Basically, it decompose the original singals into multiple orthogonal components. The generated modes have more regular structures, which makes the model more easliy to converge.<br><br>
    We present a simple snipet for generating in our case within `./utils/generate_VMD.py`. One can generate their own VMD data by selecting suitable parameters. We provide our vmd data in Baidu Drive.
 
 3. In this project, we evaluate the model performances on two datasets. Therefore, I define two sets data provider for two datasets particularly. Within each data provider, it provides two situations having vmd-assited or not.
