@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import os
 
 """
 
@@ -9,163 +10,197 @@ This code is for displaying label distribution
 
 """
 
-# # facies_volume = np.load('/home/dell/disk1/Jinlong/faciesdata/train_labels.npy')
-# facies_volume = np.load('/home/dell/disk1/Jinlong/faciesdata/labels.npy')
+def plot_facies_distribution(filepath):
+    # Load the facies volume data
+    facies_volume = np.load(filepath)
 
-# unique_classes, counts = np.unique(facies_volume, return_counts=True)
-# total_samples = facies_volume.size
+    # Calculate unique classes and their counts
+    unique_classes, counts = np.unique(facies_volume, return_counts=True)
 
-# # Calculate percentages
-# percentages = (counts / total_samples) * 100
+    # Total number of samples
+    total_samples = facies_volume.size
 
-# # Create a bar plot of the distribution
-# plt.figure(figsize=(12, 6))
-# plt.bar(unique_classes, percentages)
-# plt.title('Distribution of Facies Classes')
-# plt.xlabel('Facies Class')
-# plt.ylabel('Percentage (%)')
+    # Calculate percentages
+    percentages = (counts / total_samples) * 100
 
-# # Add percentage labels on top of each bar
-# for i, v in enumerate(percentages):
-#     plt.text(unique_classes[i], v + 0.5, f'{v:.1f}%', ha='center')
+    # Create a bar plot of the distribution
+    plt.figure(figsize=(12, 6))
+    plt.bar(unique_classes, percentages)
+    plt.title('Distribution of Facies Classes')
+    plt.xlabel('Facies Class')
+    plt.ylabel('Percentage (%)')
 
-# # Add grid for better readability
-# plt.grid(True, axis='y', linestyle='--', alpha=0.7)
+    # Add percentage labels on top of each bar
+    for i, v in enumerate(percentages):
+        plt.text(unique_classes[i], v + 0.5, f'{v:.1f}%', ha='center')
 
-# # Print the distribution details
-# print("Facies Class Distribution:")
-# for class_id, count, percentage in zip(unique_classes, counts, percentages):
-#     print(f"Class {class_id}: {count:,} samples ({percentage:.1f}%)")
-    
-# plt.savefig('13.png')
-# plt.show()
+    # Add grid for better readability
+    plt.grid(True, axis='y', linestyle='--', alpha=0.7)
 
-# Optional: Show distribution along each axis 
-# ======== This makes less sense =======
-# fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 5))
+    # Print the distribution details
+    print("Facies Class Distribution:")
+    for class_id, count, percentage in zip(unique_classes, counts, percentages):
+        print(f"Class {class_id}: {count:,} samples ({percentage:.1f}%)")
 
-# # Distribution along inline direction (axis 0)
-# inline_dist = np.mean(facies_volume, axis=(1, 2))
-# ax1.plot(inline_dist)
-# ax1.set_title('Average Distribution Along Inline')
-# ax1.set_xlabel('Inline Number')
-# ax1.set_ylabel('Average Occurrence')
+    # Save the plot as an image file
+    plt.savefig('facies_cls_distribution.png')
 
-# # Distribution along crossline direction (axis 1)
-# xline_dist = np.mean(facies_volume, axis=(0, 2))
-# ax2.plot(xline_dist)
-# ax2.set_title('Average Distribution Along Crossline')
-# ax2.set_xlabel('Crossline Number')
-# ax2.set_ylabel('Average Occurrence')
-
-# # Distribution along depth/time direction (axis 2)
-# depth_dist = np.mean(facies_volume, axis=(0, 1))
-# ax3.plot(depth_dist)
-# ax3.set_title('Average Distribution Along Depth/Time')
-# ax3.set_xlabel('Depth/Time Sample')
-# ax3.set_ylabel('Average Occurrence')
-
-# plt.tight_layout()
-# plt.savefig('11.png')
-# plt.show()
+    # Display the plot
+    plt.show()
 
 
-# def create_visualization(data_3d, labels):
-#     """
-#     Create pairplot and correlation matrix visualization from 3D data and labels
-    
-#     Parameters:
-#     data_3d: numpy array of shape (n_samples, n_features, n_dimensions)
-#     labels: array of shape (n_samples,) containing class labels
-#     """
-#     # Flatten the 3D data into 2D
-#     n_samples, n_features, n_dims = data_3d.shape
-#     flattened_data = data_3d.reshape(n_samples, -1)
-    
-#     # Create column names for the flattened features
-#     column_names = [f'feature_{i}_dim_{j}' for i in range(n_features) 
-#                    for j in range(n_dims)]
-    
-#     # Create DataFrame
-#     df = pd.DataFrame(flattened_data, columns=column_names)
-#     df['Label'] = labels
-    
-#     # Create pairplot
-#     plt.figure(figsize=(12, 12))
-#     pairplot = sns.pairplot(df, hue='Label', diag_kind='kde')
-#     plt.title('Pairplot of Features')
-    
-#     # Create correlation matrix
-#     plt.figure(figsize=(10, 8))
-#     correlation_matrix = df.drop('Label', axis=1).corr()
-#     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0)
-#     plt.title('Correlation Matrix')
-#     plt.savefig('Correlation Matrix.png')
-    
-#     return pairplot, correlation_matrix
 
-# data_3d = np.random.random((2, 5, 5))
-
-# labels = np.random.randint(0, 2, size=(2, 5, 5))
-
-# pairplot, corr_matrix = create_visualization(data_3d, labels)
-
-# Randomly generate labels for the data
-# Assuming binary labels for simplicity (0 or 1)
-# Example usage:
-# Assuming you have your 3D numpy array as data_3d and labels
-
-# data_3d = np.load('/home/dell/disk1/Jinlong/faciesdata/train_seismic.npy')
-# labels = np.load('/home/dell/disk1/Jinlong/faciesdata/train_labels.npy')
-# data_3d = data_3d[::100,::100,::10]
-# labels = labels[::100,::100,::10]
-
-
-def create_visualization(data_3d, labels):
+def select_random_traces(seismic_volume, label_volume, n_traces=5, seed=42):
     """
-    Create pairplot and correlation matrix visualization from 3D data and labels
+    Randomly select traces from a 3D seismic volume
     
     Parameters:
-    data_3d: numpy array of shape (n_samples, n_features, n_dimensions)
-    labels: array of shape (n_samples,) containing class labels
+    seismic_volume (numpy.ndarray): list of 3D array with shape (time/depth, inline, crossline)
+    label_volume (numpy.ndarray): 3D array with shape (time/depth, inline, crossline)
+    n_traces (int): Number of traces to select
+    seed (int): Random seed for reproducibility
+    
+    Returns:
+    tuple: Selected traces list, labels, and their positions (inline, crossline)
     """
-    # Flatten the 3D data into 2D
-    n_samples, n_features, n_dims = data_3d.shape
-    flattened_data = data_3d.reshape(n_samples, -1)
+    np.random.seed(seed)
+    selected_traces_volume = []
+    # Get volume dimensions
+    n_inline, n_crossline, n_samples = seismic_volume[0].shape
     
-    # Flatten the labels to match the number of samples
-    flattened_labels = labels.reshape(-1)
+    # Generate random positions
+    total_traces = n_inline * n_crossline
+    flat_indices = np.random.choice(total_traces, n_traces, replace=False)
     
-    # Ensure labels and data are aligned
-    assert flattened_data.shape[0] == flattened_labels.shape[0], "Mismatch between data and labels size."
+    # Convert to inline/crossline positions
+    inline_pos = flat_indices // n_crossline
+    crossline_pos = flat_indices % n_crossline
     
-    # Create column names for the flattened features
-    column_names = [f'feature_{i}_dim_{j}' for i in range(n_features) 
-                   for j in range(n_dims)]
+    # Extract traces
+    for i in range(len(seismic_volume)):
+        selected_traces = np.array([
+            seismic_volume[i][il, xl, :] 
+            for il, xl in zip(inline_pos, crossline_pos)
+        ]).T  # Shape: (n_samples, n_traces)
+        
+        selected_traces_volume.append(selected_traces)
+        
+    selected_label_traces = np.array([
+        label_volume[il, xl, :] 
+        for il, xl in zip(inline_pos, crossline_pos)
+    ]).T 
     
-    # Create DataFrame
-    df = pd.DataFrame(flattened_data, columns=column_names)
-    df['Label'] = flattened_labels
-    
-    # Create pairplot
-    plt.figure(figsize=(12, 12))
-    pairplot = sns.pairplot(df, hue='Label', diag_kind='kde')
-    plt.title('Pairplot of Features')
-    plt.savefig('Pairplot of Features.png')
-    plt.show()
-    
-    # Create correlation matrix
-    plt.figure(figsize=(10, 8))
-    correlation_matrix = df.drop('Label', axis=1).corr()
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', center=0)
-    plt.title('Correlation Matrix')
-    plt.savefig('Correlation Matrix.png')
-    plt.show()
-    
-    return pairplot, correlation_matrix
+    return selected_traces_volume, selected_label_traces, list(zip(inline_pos, crossline_pos))
 
-# Test the function with some random data and labels
-data_3d = np.random.random((10, 5, 5))  # 10 samples, 5 features, 5 dimensions
-labels = np.random.randint(0, 2, size=(10,))  # 10 labels for the 10 samples
 
-pairplot, corr_matrix = create_visualization(data_3d, labels)
+def prepare_trace_data(traces_volume, labels, positions, attr_name):
+    """
+    Prepare data for each trace position
+    
+    Parameters:
+    traces_volume (numpy.ndarray): Selected traces for different time samples
+    labels (numpy.ndarray): Labels for each trace
+    positions (list): List of (inline, crossline) positions
+    
+    Returns:
+    list: List of DataFrames, one for each trace position
+    """
+    df_list = []
+    
+    
+    for i, (il, xl) in enumerate(positions):
+        
+        trace_dict = {
+            f'{attr_name[j]}_Inline_{il}_Crossline_{xl}':  traces_volume[j][:, i] 
+            for j in range(len(traces_volume))
+        }
+        
+        df = pd.DataFrame(trace_dict)
+        df['label'] = labels[:, i]  
+        
+        df_list.append(df)
+    
+    return df_list
+
+
+def create_visualization(data, file_name):
+    """
+    Create pairplot and correlation matrix for given features and label
+    
+    Parameters:
+    data (pandas.DataFrame): Input dataframe
+    features (list): List of feature column names
+    label_column (str): Name of the label column
+    """
+    
+    plot_data = data
+    label_column = 'label'
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
+    
+    sns.set_style("whitegrid")
+    pairplot = sns.pairplot(plot_data, 
+                           hue=label_column,
+                           diag_kind="kde",
+                           plot_kws={'alpha': 0.6},
+                           diag_kws={'alpha': 0.6})
+    
+    correlation_matrix = plot_data.corr()
+    
+    sns.heatmap(correlation_matrix,
+                annot=True,
+                cmap='coolwarm',
+                vmin=-1,
+                vmax=1,
+                center=0,
+                ax=ax2)
+    
+    ax2.set_title('Correlation Matrix')
+    
+    plt.tight_layout()
+    
+    output_dir = './output'
+    figures_dir = os.path.join(output_dir, 'figures')
+    if not os.path.exists(figures_dir):
+        os.makedirs(figures_dir, exist_ok=True)
+    
+    filepath = os.path.join(figures_dir, f'Horizon_{file_name}_correlation_matrix.png')
+    plt.savefig(filepath)
+    
+    return pairplot, fig
+
+
+if __name__ == "__main__":
+    
+
+    np.random.seed(42)
+    n_samples = 100
+    attr_name = ['seismic', 'freq', 'dip', 'phase', 'rms']
+    
+    seismic_volume_1 = np.load('/home/dell/disk1/Jinlong/Horizontal-data/F3_seismic.npy')
+    seismic_volume_2 = np.load('/home/dell/disk1/Jinlong/Horizontal-data/F3_crop_horizon_freq.npy')
+    seismic_volume_3 = np.load('/home/dell/disk1/Jinlong/Horizontal-data/F3_predict_MCDL_crossline.npy')
+    seismic_volume_4 = np.load('/home/dell/disk1/Jinlong/Horizontal-data/F3_crop_horizon_phase.npy')
+    seismic_volume_5 = np.load('/home/dell/disk1/Jinlong/Horizontal-data/F3_RMSAmp.npy')
+    seismic_labels = np.load('/home/dell/disk1/Jinlong/Horizontal-data/test_label_no_ohe.npy')
+    
+    # Make sure all the data are in 3D views mcdl has 600 not 601 inline slices
+    seismic_volume_1 = np.squeeze(seismic_volume_1).reshape(-1, 951, 288)
+    seismic_volume_2 = seismic_volume_2.reshape(-1, 951, 288)
+    seismic_volume_3 = np.swapaxes(seismic_volume_3, -1, 1)
+    seismic_volume_4 = seismic_volume_4.reshape(-1, 951, 288)
+    seismic_volume_5 = seismic_volume_5.reshape(-1, 951, 288)
+    seismic_labels = seismic_labels.reshape(-1, 951, 288)
+    
+    n_traces = 5
+    seed = 42
+    seismic_volume = [seismic_volume_1,seismic_volume_2, seismic_volume_3, seismic_volume_4, seismic_volume_5]
+    selected_traces_volume, selected_labels, positions = select_random_traces(seismic_volume, seismic_labels, n_traces, seed)
+    
+    df_list = prepare_trace_data(selected_traces_volume, selected_labels, positions, attr_name)
+    
+    for i, (il, xl) in enumerate(positions):
+        file_name = f'Inline_{il}_Crossline_{xl}'
+        pairplot, correlation_fig = create_visualization(df_list[i], file_name)
+     
+        
+    # plot_facies_distribution(seismic_labels)
