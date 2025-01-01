@@ -135,6 +135,7 @@ def create_visualization(data, file_name):
     
     plot_data = data
     label_column = 'label'
+    # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
     # facies_palette = ['#F4D03F', '#F5B041','#DC7633','#6E2C00',
     #    '#1B4F72','#2E86C1', '#AED6F1']
     # palette = sns.husl_palette(s=.4)
@@ -194,3 +195,5 @@ if __name__ == "__main__":
         file_name = f'Inline_{il}_Crossline_{xl}'
         pairplot = create_visualization(df_list[i], file_name)
      
+        
+    # plot_facies_distribution(seismic_labels)

@@ -135,19 +135,16 @@ def create_visualization(data, file_name):
     
     plot_data = data
     label_column = 'label'
-    # facies_palette = ['#F4D03F', '#F5B041','#DC7633','#6E2C00',
-    #    '#1B4F72','#2E86C1', '#AED6F1']
-    # palette = sns.husl_palette(s=.4)
-    palette = sns.color_palette()
-    
+    # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
+    facies_colors = ['#F4D03F', '#F5B041','#DC7633','#6E2C00',
+       '#1B4F72','#2E86C1', '#AED6F1']
     sns.set_style("ticks")
     # fig.set_facecolor('white') 
     pairplot = sns.pairplot(plot_data, 
                            hue=label_column,
                            diag_kind="kde",
                            plot_kws={'alpha': 0.6},
-                           diag_kws={'alpha': 0.6},
-                           palette=palette)
+                           diag_kws={'alpha': 0.6})
     
     output_dir = './output'
     figures_dir = os.path.join(output_dir, 'figures')
@@ -157,6 +154,23 @@ def create_visualization(data, file_name):
     # Save pairplot
     pairplot_path = os.path.join(figures_dir, f'Horizon_{file_name}_pairplot.png')
     pairplot.savefig(pairplot_path)
+    
+    # Create and save correlation matrix separately
+    plt.figure(figsize=(10, 8))
+    correlation_matrix = plot_data.corr()
+    
+    sns.heatmap(correlation_matrix,
+                annot=True,
+                cmap=facies_colors,
+                vmin=-1,
+                vmax=1,
+                center=0)
+    
+    plt.title('Correlation Matrix')
+    
+    # Save correlation matrix
+    corr_path = os.path.join(figures_dir, f'Horizon_{file_name}_correlation_matrix.png')
+    plt.savefig(corr_path)
     
     return pairplot
 
@@ -192,5 +206,7 @@ if __name__ == "__main__":
     
     for i, (il, xl) in enumerate(positions):
         file_name = f'Inline_{il}_Crossline_{xl}'
-        pairplot = create_visualization(df_list[i], file_name)
+        pairplot, correlation_fig = create_visualization(df_list[i], file_name)
      
+        
+    # plot_facies_distribution(seismic_labels)
