@@ -1,6 +1,7 @@
 from collections import Counter
 
 best_setup_indices = []
+
 def model_selection(mse, mae, training_times):
     # length of the whole sets
     # Benchmark setup (setup 0)

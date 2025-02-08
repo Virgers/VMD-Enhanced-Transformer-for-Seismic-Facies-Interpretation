@@ -177,11 +177,10 @@ class Exp_ssl(Exp_Basic):
                 break
             adjust_learning_rate(model_optim, epoch + 1, self.args)
 
-        # save models
-            
-        # best_model_path = path + '/' + 'checkpoint.pth'
-        # self.model.load_state_dict(torch.load(best_model_path))
-        # torch.save(self.model.state_dict(), best_model_path)
+        # save ssl models
+        best_model_path = path + '/' + 'checkpoint.pth'
+        self.model.load_state_dict(torch.load(best_model_path))
+        torch.save(self.model.state_dict(), best_model_path)
         avg_epoch_duration = total_epoch_duration / self.args.train_epochs
         print(f"average epoch time: {avg_epoch_duration:.3f} seconds")
 

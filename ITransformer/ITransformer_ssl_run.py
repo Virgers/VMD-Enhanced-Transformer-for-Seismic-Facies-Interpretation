@@ -11,7 +11,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] ="0"
 
 
 def main(config):
-       
+    
     Exp = Exp_ssl
 
     now = datetime.datetime.now()

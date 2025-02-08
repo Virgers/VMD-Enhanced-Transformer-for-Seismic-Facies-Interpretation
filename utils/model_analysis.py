@@ -17,7 +17,6 @@ import pandas as pd
 import torch
 
 
-
 def analyze_model_structure(model, save_path='model_analysis'):
     # Create directory if it doesn't exist
     import os
