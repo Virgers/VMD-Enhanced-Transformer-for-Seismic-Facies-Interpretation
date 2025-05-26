@@ -33,3 +33,8 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+*.pth
+*.npy
+*.h5
+data/
+checkpoints/
