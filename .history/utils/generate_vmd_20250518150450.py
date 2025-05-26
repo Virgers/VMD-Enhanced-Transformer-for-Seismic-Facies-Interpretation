@@ -131,10 +131,10 @@ def visualize_vmd_results(trace_index, u, u_hat, omega, original_signal):
             freq_value = center_freqs_hz[i]
             
         if i in selected_imfs:
-            axs[i+1].plot(time_axis, u[i], 'blue', linewidth=1.5)
+            axs[i+1].plot(time_axis, u[i], 'red', linewidth=1.5)
             axs[i+1].set_title(f'IMF {i+1} (Center Freq: {freq_value:.2f} Hz) - Selected', fontsize=14)
         else:
-            axs[i+1].plot(time_axis, u[i], 'red', linewidth=1.5)
+            axs[i+1].plot(time_axis, u[i], 'blue', linewidth=1.5)
             axs[i+1].set_title(f'IMF {i+1} (Center Freq: {freq_value:.2f} Hz)', fontsize=14)
         
         axs[i+1].set_ylabel('Amplitude', fontsize=12)

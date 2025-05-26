@@ -13,7 +13,7 @@ This code is for displaying label distribution
 def plot_facies_distribution(filepath):
     # Load the facies volume data
     facies_volume = np.load(filepath)
-    facies_volume = facies_volume['labels']
+
     # Calculate unique classes and their counts
     unique_classes, counts = np.unique(facies_volume, return_counts=True)
 
@@ -200,10 +200,9 @@ if __name__ == "__main__":
     
     # filepath = '/home/dell/disk1/Jinlong/faciesdata/train_labels.npy'
     filepath = '/home/dell/disk1/Jinlong/faciesdata/labels_train.npz'
-    # print(filepath) 
-    # filepath = filepath['label']
-       
-    # print(filepath.shape)
+    filepath = filepath['labels']
+    print(type(filepath))    
+    print(filepath.shape)
     plot_facies_distribution(filepath)
     
     # df_list = prepare_trace_data(selected_traces_volume, selected_labels, positions, attr_name)

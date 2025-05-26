@@ -22,18 +22,18 @@ class SegyConverter:
         """
         try:
             with segyio.open(self.input_file, 'r', ignore_geometry=True) as segy_file:
-               
+                # Get dimensions
                 n_traces = len(segy_file.trace)
                 n_samples = len(segy_file.samples)
                 
                 # Pre-allocate the numpy array
                 data = np.zeros((n_traces, n_samples), dtype='float32')
                 
-              
+                # Read all traces with progress bar
                 for i in tqdm(range(n_traces), desc="Converting traces"):
                     data[i] = segy_file.trace[i]
                     
-               
+                # Save to NPY file
                 np.save(self.output_file, data)
                 print(f"Successfully converted to {self.output_file}")
                 print(f"Output shape: {data.shape}")
@@ -152,13 +152,16 @@ class SegyConverter:
             
         return chunk_file
 
+# Example usage
 if __name__ == "__main__":
     # File paths
     sgy_file = "/home/dell/disk1/Jinlong/faciesdata/SEG2020/TestData_Image2.segy"
     npy_file = "TestData_Image2.npy"
     
+    # Create converter instance
     converter = SegyConverter(sgy_file, npy_file)
     
+    # Choose conversion method based on file size
     file_size = os.path.getsize(sgy_file)
     
     if file_size < 1e9:  # Less than 1GB
@@ -167,4 +170,3 @@ if __name__ == "__main__":
         converter.convert_large_file(chunk_size=1000)
     else:  # Larger files
         converter.parallel_convert()
-        

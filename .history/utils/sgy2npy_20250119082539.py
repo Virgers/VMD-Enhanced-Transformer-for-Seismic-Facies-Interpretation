@@ -167,4 +167,3 @@ if __name__ == "__main__":
         converter.convert_large_file(chunk_size=1000)
     else:  # Larger files
         converter.parallel_convert()
-        

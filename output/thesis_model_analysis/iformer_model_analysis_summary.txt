@@ -1,0 +1,5 @@
+Model Summary:
+Total Parameters: 123,073
+Trainable Parameters: 101,889
+Non-trainable Parameters: 21,184
+Number of Layers: 32

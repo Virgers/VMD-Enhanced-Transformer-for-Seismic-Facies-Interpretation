@@ -108,41 +108,28 @@ def visualize_vmd_results(trace_index, u, u_hat, omega, original_signal):
     axs[0].set_ylabel('Amplitude', fontsize=12)
     axs[0].set_xlim(0, n_samples)
     
-    # Convert omega to Hz for display - handle array case
-    fs = 1.0  # Normalized sampling frequency
-    
-    # Handle different shapes of omega
-    if np.isscalar(omega[0]):
-        # If omega is already scalar per mode
-        center_freqs_hz = omega * fs / (2*np.pi)
-    else:
-        # If omega is array per mode, take the final value (most converged)
-        center_freqs_hz = np.array([om[-1] if len(np.atleast_1d(om)) > 0 else om for om in omega]) * fs / (2*np.pi)
+    # Convert omega to Hz for display
+    fs = 1.0  # Normalized sampling frequency  
+    center_freqs_hz = omega * fs / (2*np.pi)
     
     # Select IMFs to highlight (for this example, choose first two)
-    selected_imfs = [0, 1, 2]
+    selected_imfs = [0, 1]
     
     # Plot selected IMFs (first 3 components)
     for i in range(3):
-        # Get the center frequency as a scalar
-        if isinstance(center_freqs_hz[i], (np.ndarray, list)):
-            freq_value = center_freqs_hz[i][-1] if len(center_freqs_hz[i]) > 0 else 0
-        else:
-            freq_value = center_freqs_hz[i]
-            
         if i in selected_imfs:
-            axs[i+1].plot(time_axis, u[i], 'blue', linewidth=1.5)
-            axs[i+1].set_title(f'IMF {i+1} (Center Freq: {freq_value:.2f} Hz) - Selected', fontsize=14)
-        else:
             axs[i+1].plot(time_axis, u[i], 'red', linewidth=1.5)
-            axs[i+1].set_title(f'IMF {i+1} (Center Freq: {freq_value:.2f} Hz)', fontsize=14)
+            axs[i+1].set_title(f'IMF {i+1} (Center Freq: {center_freqs_hz[i]:.2f} Hz) - Selected', fontsize=14)
+        else:
+            axs[i+1].plot(time_axis, u[i], 'blue', linewidth=1.5)
+            axs[i+1].set_title(f'IMF {i+1} (Center Freq: {center_freqs_hz[i]:.2f} Hz)', fontsize=14)
         
         axs[i+1].set_ylabel('Amplitude', fontsize=12)
         axs[i+1].set_xlim(0, n_samples)
     
     # Plot comparison of original and reconstructed
-    axs[4].plot(time_axis, original_signal, 'blue', linewidth=1, label='Original')
-    axs[4].plot(time_axis, reconstructed_signal, 'red', linewidth=1, label='Reconstructed')
+    axs[4].plot(time_axis, original_signal, 'blue', linewidth=1.5, label='Original')
+    axs[4].plot(time_axis, reconstructed_signal, 'red', linewidth=1.5, label='Reconstructed')
     axs[4].set_title('Original vs Reconstructed Signal', fontsize=14)
     axs[4].set_xlabel('Time (s)', fontsize=12)
     axs[4].set_ylabel('Amplitude', fontsize=12)

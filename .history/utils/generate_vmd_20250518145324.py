@@ -58,17 +58,16 @@ from matplotlib.gridspec import GridSpec
 alpha, tau, K, DC, init, tol = 2000, 0, 8, 0, 1, 1e-7
 
 # Load data
-f3facies = np.load('/home/dell/disk1/Jinlong/faciesdata/train_labels.npy')
+f3facies = np.load('/home/dell/disk1/Jinlong/faciesdata/train_labels.npy')   # (401, 701, 255)
 f3facies = f3facies.reshape(-1, 255)
 
 NZFacies = np.load("/home/dell/disk1/Jinlong/faciesdata/data_train.npz")     
 NZFacies = NZFacies['data']
 NZFacies = np.swapaxes(NZFacies, 1, 0)
 NZFacies = np.swapaxes(NZFacies, -1, 1)
-NZFacies = NZFacies.reshape(-1, 1006)
+NZFacies = NZFacies.reshape(-1, 1006)  # (782, 590, 1006)
 NZFacies = NZFacies[:10,]
-
-# Use NZFacies data
+# Use f3facies data
 f = NZFacies
     
 # Function to process each trace
@@ -90,71 +89,68 @@ for idx in sample_indices:
 
 print("Processing complete for visualization samples.")
 
-# Visualization part - similar to the provided example
-def visualize_vmd_results(trace_index, u, u_hat, omega, original_signal):
-    # VMD correctly reconstructs by summing the IMFs
+# Visualization part
+def visualize_vmd_results(trace_index, u, original_signal, omega):
+    # VMD correctly reconstructs by summing the IMFs (but need to verify format)
     reconstructed_signal = np.sum(u, axis=0)
+    # Calculate reconstruction error
+    error = original_signal - reconstructed_signal
+    
+    # Time domain for x-axis
+    time = np.arange(len(original_signal))
     
     # Create a figure with 5 subfigures
-    fig, axs = plt.subplots(5, 1, figsize=(12, 10), gridspec_kw={'hspace': 0.4})
-    
-    # Sample length for x-axis
-    n_samples = len(original_signal)
-    time_axis = np.arange(n_samples)
+    plt.figure(figsize=(20, 16))
+    gs = GridSpec(5, 1, figure=plt.gcf(), hspace=1)
     
     # Plot original signal
-    axs[0].plot(time_axis, original_signal, 'blue', linewidth=1.5)
-    axs[0].set_title('Original Signal', fontsize=14)
-    axs[0].set_ylabel('Amplitude', fontsize=12)
-    axs[0].set_xlim(0, n_samples)
-    
-    # Convert omega to Hz for display - handle array case
-    fs = 1.0  # Normalized sampling frequency
-    
-    # Handle different shapes of omega
-    if np.isscalar(omega[0]):
-        # If omega is already scalar per mode
-        center_freqs_hz = omega * fs / (2*np.pi)
-    else:
-        # If omega is array per mode, take the final value (most converged)
-        center_freqs_hz = np.array([om[-1] if len(np.atleast_1d(om)) > 0 else om for om in omega]) * fs / (2*np.pi)
-    
-    # Select IMFs to highlight (for this example, choose first two)
-    selected_imfs = [0, 1, 2]
+    ax1 = plt.subplot(gs[0])
+    ax1.plot(time, original_signal, 'b', linewidth=1)
+    ax1.set_title('Original Seismic Signal', fontsize=22)
+    ax1.set_ylabel('Amplitude', fontsize=18)
+    ax1.tick_params(axis='both', which='major', labelsize=16)
     
     # Plot selected IMFs (first 3 components)
     for i in range(3):
-        # Get the center frequency as a scalar
-        if isinstance(center_freqs_hz[i], (np.ndarray, list)):
-            freq_value = center_freqs_hz[i][-1] if len(center_freqs_hz[i]) > 0 else 0
-        else:
-            freq_value = center_freqs_hz[i]
-            
-        if i in selected_imfs:
-            axs[i+1].plot(time_axis, u[i], 'blue', linewidth=1.5)
-            axs[i+1].set_title(f'IMF {i+1} (Center Freq: {freq_value:.2f} Hz) - Selected', fontsize=14)
-        else:
-            axs[i+1].plot(time_axis, u[i], 'red', linewidth=1.5)
-            axs[i+1].set_title(f'IMF {i+1} (Center Freq: {freq_value:.2f} Hz)', fontsize=14)
+        ax = plt.subplot(gs[i+1])
+        ax.plot(time, u[i], linewidth=1, label=f'IMF {i+1}')
         
-        axs[i+1].set_ylabel('Amplitude', fontsize=12)
-        axs[i+1].set_xlim(0, n_samples)
+        # Get center frequency for this IMF and convert to more readable form
+        center_freq = omega[i, -1]  # Use the final iteration's center frequency
+        
+        # Add center frequency to the title
+        ax.set_title(f'IMF {i+1}: Center Frequency = {center_freq:.4f} rad/sample', fontsize=22)
+        ax.set_ylabel('Amplitude', fontsize=18)
+        ax.tick_params(axis='both', which='major', labelsize=16)
     
     # Plot comparison of original and reconstructed
-    axs[4].plot(time_axis, original_signal, 'blue', linewidth=1, label='Original')
-    axs[4].plot(time_axis, reconstructed_signal, 'red', linewidth=1, label='Reconstructed')
-    axs[4].set_title('Original vs Reconstructed Signal', fontsize=14)
-    axs[4].set_xlabel('Time (s)', fontsize=12)
-    axs[4].set_ylabel('Amplitude', fontsize=12)
-    axs[4].set_xlim(0, n_samples)
-    axs[4].legend(fontsize=10)
+    ax5 = plt.subplot(gs[4])
+    ax5.plot(time, original_signal, 'b', linewidth=1, label='Original')
+    ax5.plot(time, reconstructed_signal, 'r-', linewidth=1, label='Reconstructed')
+    # Plot reconstruction error
+    ax5.plot(time, error, 'g:', linewidth=1, label='Error')
+    ax5.set_title('Original vs Reconstructed Signal', fontsize=22)
+    ax5.set_xlabel('Sample Index', fontsize=18)
+    ax5.set_ylabel('Amplitude', fontsize=18)
+    ax5.tick_params(axis='both', which='major', labelsize=16)
+    ax5.legend(fontsize=16)
     
-    # Adjust y-limits for better visual comparison if needed
-    for ax in axs:
-        ax.grid(False)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
+    # Add a secondary axis to show frequency distribution
+    plt.figure(figsize=(8, 6))
+    # 修正 stem 函数调用 - 使用命名参数
+    plt.stem(np.arange(len(omega[:, -1])), omega[:, -1], linefmt='b-', markerfmt='bo', basefmt=" ")
+    plt.title('Center Frequencies of All IMFs', fontsize=22)
+    plt.xlabel('IMF Index', fontsize=18)
+    plt.ylabel('Center Frequency (rad/sample)', fontsize=18)
+    plt.xticks(np.arange(len(omega[:, -1])), fontsize=16)
+    plt.yticks(fontsize=16)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig(f'vmd_frequencies_trace_{trace_index}.png', dpi=300, bbox_inches='tight')
+    plt.close()
     
+    # 返回到主图并保存
+    plt.figure(1)  # 更明确地指定图形编号
     plt.tight_layout()
     plt.savefig(f'vmd_visualization_trace_{trace_index}.png', dpi=300, bbox_inches='tight')
     plt.close()
@@ -162,5 +158,5 @@ def visualize_vmd_results(trace_index, u, u_hat, omega, original_signal):
 
 # Visualize results
 for result in results:
-    idx, u, u_hat, omega = result
-    visualize_vmd_results(idx, u, u_hat, omega, f[idx])
+    idx, u, _, omega = result
+    visualize_vmd_results(idx, u, f[idx], omega)

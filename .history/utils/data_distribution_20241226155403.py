@@ -1,1 +1,0 @@
-c:\Users\Administrator\Desktop\Figure_1.png

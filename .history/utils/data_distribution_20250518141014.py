@@ -13,7 +13,7 @@ This code is for displaying label distribution
 def plot_facies_distribution(filepath):
     # Load the facies volume data
     facies_volume = np.load(filepath)
-    facies_volume = facies_volume['labels']
+
     # Calculate unique classes and their counts
     unique_classes, counts = np.unique(facies_volume, return_counts=True)
 
@@ -23,23 +23,16 @@ def plot_facies_distribution(filepath):
     # Calculate percentages
     percentages = (counts / total_samples) * 100
 
-    # Set the font sizes
-    plt.rcParams.update({'font.size': 18})
-    
     # Create a bar plot of the distribution
-    plt.figure(figsize=(14, 8))
-    plt.bar(unique_classes, percentages, width=0.7)
-    plt.title('Distribution of Facies Classes', fontsize=24)
-    plt.xlabel('Facies Class', fontsize=20)
-    plt.ylabel('Percentage (%)', fontsize=20)
-    
-    # Increase tick label size
-    plt.xticks(fontsize=18)
-    plt.yticks(fontsize=18)
+    plt.figure(figsize=(12, 6))
+    plt.bar(unique_classes, percentages)
+    plt.title('Distribution of Facies Classes')
+    plt.xlabel('Facies Class')
+    plt.ylabel('Percentage (%)')
 
     # Add percentage labels on top of each bar
     for i, v in enumerate(percentages):
-        plt.text(unique_classes[i], v + 0.5, f'{v:.1f}%', ha='center', fontsize=18)
+        plt.text(unique_classes[i], v + 0.5, f'{v:.1f}%', ha='center')
 
     # Add grid for better readability
     plt.grid(True, axis='y', linestyle='--', alpha=0.7)
@@ -49,14 +42,12 @@ def plot_facies_distribution(filepath):
     for class_id, count, percentage in zip(unique_classes, counts, percentages):
         print(f"Class {class_id}: {count:,} samples ({percentage:.1f}%)")
 
-    # Adjust layout to ensure everything fits
-    plt.tight_layout()
-    
-    # Save the plot as a high-resolution image file
-    plt.savefig('facies_cls_distribution3.png', dpi=300, bbox_inches='tight')
+    # Save the plot as an image file
+    plt.savefig('facies_cls_distribution2.png')
 
     # Display the plot
     plt.show()
+
 
 
 def select_random_traces(seismic_volume, label_volume, n_traces=5, seed=42):
@@ -183,7 +174,7 @@ if __name__ == "__main__":
     # seismic_volume_4 = np.load('/home/dell/disk1/Jinlong/Horizontal-data/F3_crop_horizon_phase.npy')
     # seismic_volume_5 = np.load('/home/dell/disk1/Jinlong/Horizontal-data/F3_RMSAmp.npy')
     seismic_labels = np.load('/home/dell/disk1/Jinlong/Horizontal-data/test_label_no_ohe.npy')
-    # seismic_labels = np.load('/home/dell/disk1/Jinlong/Horizontal-data/test_label_no_ohe.npy')
+    
     # Make sure all the data are in 3D views mcdl has 600 not 601 inline slices
     # seismic_volume_1 = np.squeeze(seismic_volume_1).reshape(-1, 951, 288)
     # seismic_volume_2 = seismic_volume_2.reshape(-1, 951, 288)
@@ -196,15 +187,8 @@ if __name__ == "__main__":
     # seed = 42
     # seismic_volume = [seismic_volume_1,seismic_volume_2, seismic_volume_3, seismic_volume_4, seismic_volume_5]
     # selected_traces_volume, selected_labels, positions = select_random_traces(seismic_volume, seismic_labels, n_traces, seed)
-    # filepath = '/home/dell/disk1/Jinlong/Horizontal-data/test_label_no_ohe.npy'
     
-    # filepath = '/home/dell/disk1/Jinlong/faciesdata/train_labels.npy'
-    filepath = '/home/dell/disk1/Jinlong/faciesdata/labels_train.npz'
-    # print(filepath) 
-    # filepath = filepath['label']
-       
-    # print(filepath.shape)
-    plot_facies_distribution(filepath)
+    plot_facies_distribution(seismic_labels)
     
     # df_list = prepare_trace_data(selected_traces_volume, selected_labels, positions, attr_name)
     
