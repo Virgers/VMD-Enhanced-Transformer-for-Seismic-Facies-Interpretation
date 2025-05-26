@@ -38,3 +38,7 @@ Thumbs.db
 *.h5
 data/
 checkpoints/
+*.npy
+*.pth
+checkpoint/
+output/
