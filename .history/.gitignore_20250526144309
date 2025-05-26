@@ -1,0 +1,35 @@
+# Large files
+*.pth
+*.pt
+*.pkl
+*.npy
+*.h5
+*.hdf5
+*.mat
+
+# Data directories
+data/
+datasets/
+checkpoints/
+logs/
+outputs/
+results/
+experiments/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
