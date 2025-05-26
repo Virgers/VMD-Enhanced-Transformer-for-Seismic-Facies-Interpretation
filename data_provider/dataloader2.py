@@ -1,3 +1,4 @@
+# Almost the same as the dataloader.py, but with the foucs on the newzealand dataset
 import os
 import numpy as np
 import torch

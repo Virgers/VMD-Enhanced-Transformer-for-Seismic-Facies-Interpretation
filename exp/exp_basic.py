@@ -1,5 +1,34 @@
-import os
+# Model Experiment Base
+# Quick Start
+# Inherit the base class:
 
+# Create your experiment class inheriting from Exp_Basic
+# Implement required methods: _build_model(), _get_data(), train(), vali(), test()
+# Initialize with configuration:
+
+# from exp.exp_basic import Exp_Basic
+
+# class MyExperiment(Exp_Basic):
+#     def _build_model(self):
+#         # Select a model from self.model_dict based on args
+#         return self.model_dict[self.args.model](self.args)
+    
+#     # Implement other required methods...
+
+# # Run your experiment
+# exp = MyExperiment(args)
+# exp.train()
+# Use provided functionality:
+
+# Model registry with multiple transformer architectures
+# Automatic device selection (CPU/GPU)
+# Base experiment structure
+# Output
+# Base class methods: Device configuration, model initialization
+# Model dictionary: Access to multiple transformer architectures
+# Abstract methods: Structure for implementing custom experiment logic
+
+import os
 import torch
 
 from models import (Autoformer, BiLSTM, FEDformer, Informer,

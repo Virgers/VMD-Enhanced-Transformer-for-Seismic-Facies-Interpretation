@@ -4,7 +4,7 @@ import datetime
 # from test_exp_classification import Exp_Classification
 
 # from ITransformer_imp_options import Options, setup
-from BiLSTMoptions import Options, setup
+from BiLSTM.BiLSTM_seis_cls_cfg import Options, setup
 # from ITransformer_nz_cls_options import Options, setup
 
 num_gpus = torch.cuda.device_count()

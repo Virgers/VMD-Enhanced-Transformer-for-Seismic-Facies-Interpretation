@@ -1,8 +1,28 @@
+# ITransformer SSL Runner
+# Quick Start
+# Prepare your configuration:
+
+# Set dataset path and proportions in config file
+# Configure mask rate for self-supervised learning
+# Enable/disable VMD processing with the --is_vmd flag
+# Adjust embedding, epochs, and batch size parameters
+# Training:
+
+# python ITransformer/ITransformer_ssl_run.py --is_training 1 --train_epochs 100 --mask_rate 0.25 --batch_size 32
+# Testing:
+
+# python ITransformer/ITransformer_ssl_run.py --is_testing 1 --mask_rate 0.25
+# Output
+# Training logs: Detailed progress information
+# Model checkpoints: Saved at specified intervals
+# Evaluation metrics: Performance on test data
+# Settings summary: Configuration parameters used for each run
+# All outputs organized by timestamp and experiment configuration.
 import os
 import torch
 import datetime
 
-from ITransformer_ssl_options import Options, setup
+from ITransformer.ITransformer_seis_ssl_cfg import Options, setup
 from exp.exp_ssl import Exp_ssl
 
 device = torch.device('cuda:0')

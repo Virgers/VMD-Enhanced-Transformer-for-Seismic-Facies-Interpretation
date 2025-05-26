@@ -1,8 +1,29 @@
+# ITransformer Seismic Classifier
+# Quick Start
+# Prepare your data:
+
+# Organize seismic data in the expected directory structure
+# Configure dataset parameters in the options file
+# Set VMD processing flag (--is_vmd) if using decomposed signals
+# Adjust training/testing proportions as needed
+# Training:
+
+# python ITransformer/ITransformer_cls_run.py --is_training True --train_epochs 100 --batch_size 32 --mask_rate 0.25
+# Testing:
+
+# python ITransformer/ITransformer_cls_run.py --is_testing True
+# Output
+# Training logs: Progress tracking with metrics
+# Model checkpoints: Saved during training at specified intervals
+# Test results: Classification metrics and performance evaluation
+# Visualization: Optional result visualizations (if enabled)
+# All outputs organized by timestamp and configuration parameters for easy tracking.
+
 import datetime
 import os
 
 import torch
-from ITransformer_cls_options import Options, setup
+from ITransformer.ITransformer_seis_cls_cfg import Options, setup
 
 device = torch.device('cuda:0')
 torch.cuda.set_device(device)

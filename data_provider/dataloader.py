@@ -1,3 +1,41 @@
+# Seismic Dataset Loader
+# Quick Start
+# Prepare your data:
+
+# Place seismic data, VMD-processed data, and labels in appropriate folders
+# Ensure data is in NumPy (.npy) format
+# Create mask file if using masked features
+# Set proportions for train/validation/test splits
+# Import and initialize:
+
+# from data_provider.dataloader import TSF_custom
+
+# # Initialize dataset
+# dataset = TSF_custom(
+#     is_vmd=True,                # Set to True for VMD-processed data
+#     flag='train',               # 'train', 'val', or 'test'
+#     root_path='./data',         # Root directory
+#     data_path='seismic.npy',    # Regular data path
+#     vmd_data_path='vmd.npy',    # VMD data path
+#     label_path='labels.npy',    # Labels path
+#     mask_path='masks.npy',      # Mask path
+#     train_proportion=0.2,       # Proportion for training
+#     test_proportion=0.7,        # Proportion for testing
+#     val_proportion=0.1          # Proportion for validation
+# )
+# Access data samples:
+
+# # Get a sample
+# data, label, mask = dataset[0]
+
+# # Use with DataLoader
+# from torch.utils.data import DataLoader
+# dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+# Output
+# data: Standardized seismic data (regular or VMD-processed)
+# label: Corresponding labels for classification/regression
+# mask: Mask values for features
+# Each returned as PyTorch tensors, ready for model training
 import os
 import numpy as np
 import torch

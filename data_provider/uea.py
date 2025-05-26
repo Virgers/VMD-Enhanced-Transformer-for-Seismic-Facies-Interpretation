@@ -1,6 +1,34 @@
-import os
-import pandas as pd
-import numpy as np
+# Sequence Batch Processor
+# Quick Start
+# Prepare your dataset:
+
+# Ensure your data is in the correct format (sequences, labels, masks)
+# Create a dataset class that returns tuples of (data, label, mask)
+# Set up padding strategy for variable-length sequences
+# Use the collation function:
+
+# from data_provider.uea import collate_fn
+# from torch.utils.data import DataLoader
+
+# # Create DataLoader with custom collation
+# dataloader = DataLoader(
+#     your_dataset,
+#     batch_size=32,
+#     shuffle=True,
+#     collate_fn=lambda x: collate_fn(x, max_len=128)
+# )
+# Process batches:
+
+# for batch_data, batch_labels, batch_masks in dataloader:
+#     # Feed data to your model
+#     outputs = model(batch_data, batch_masks)
+#     # Calculate loss, etc.
+# Output
+# Batched data: Padded tensor of shape (batch_size, padded_length, feat_dim)
+# Batched labels: Padded tensor of shape (batch_size, padded_length, label_dim)
+# Padding masks: Boolean tensor indicating valid (1) vs. padded (0) positions
+# All tensors properly aligned and ready for model training
+
 import torch
 
 

@@ -1,3 +1,5 @@
+# Almost same as the datafactory.py, but with the foucs on the newzealand dataset
+
 from torch.utils.data import DataLoader
 from data_provider.dataloader2 import TSF_custom
 from data_provider.uea2 import collate_fn

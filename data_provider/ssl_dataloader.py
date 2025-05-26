@@ -1,8 +1,7 @@
+# Almost the same dataloader.py but this is for self supervised learning task
 import os
 import numpy as np
-import pandas as pd
-import glob
-import re
+
 import torch
 from torch.utils.data import Dataset
 from sklearn.preprocessing import StandardScaler

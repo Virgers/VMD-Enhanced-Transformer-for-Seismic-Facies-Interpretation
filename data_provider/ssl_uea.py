@@ -1,5 +1,4 @@
-import os
-import pandas as pd
+# Almost the same as the uea.py but for self supervised learning task
 import numpy as np
 import torch
 

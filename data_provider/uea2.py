@@ -1,7 +1,6 @@
-import os
-import pandas as pd
-import numpy as np
+# Almost same as the uea.py but this is for the newzealand dataset
 import torch
+
 
 def collate_fn(data, max_len=None):
     """Build mini-batch tensors from a list of (X, mask) tuples. Mask input. Create

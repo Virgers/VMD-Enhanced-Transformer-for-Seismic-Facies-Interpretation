@@ -1,17 +1,37 @@
-import torch    
-import argparse
-import random
+# ITransformer SSL Configuration Manager
+# Quick Start
+# Configure your experiment:
 
-import logging
-import sys
-import os
-import traceback
+# Set dataset paths and proportions in the configuration
+# Adjust model parameters (dimensions, layers, heads)
+# Configure SSL-specific settings (mask rate, mask type)
+# Set training parameters (batch size, epochs, learning rate)
+# Training:
+
+# python ITransformer/ITransformer_ssl_run.py --config your_config.json --train_epochs 100 --mask_rate 0.375
+# Testing:
+
+# python ITransformer/ITransformer_ssl_run.py --config your_config.json --is_training 0 --is_testing 1
+# Output
+# Configuration file: Saved JSON with all parameters
+# Checkpoints: Model weights saved during training
+# Predictions: Self-supervised learning outputs
+# Tensorboard logs: Training metrics and visualizations
+# All outputs organized in timestamped directories for easy experiment tracking.
+
+import argparse
 import json
-from datetime import datetime
+import logging
+import os
 import random
 import string
-import logging
+import sys
+import traceback
+from datetime import datetime
+
 import numpy as np
+import torch
+
 logger = logging.getLogger('__main__')
 
 

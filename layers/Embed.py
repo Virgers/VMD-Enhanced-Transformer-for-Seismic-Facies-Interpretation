@@ -1,3 +1,23 @@
+# # Neural Network Embedding Layers
+
+# ## Purpose
+# This module provides various embedding components for transformer-based neural networks, with specialized options for seismic data processing:
+
+# - Positional embeddings: Add sequence position information to feature vectors
+# - Token embeddings: Transform input features using convolutional layers 
+# - Temporal embeddings: Encode time-based information (hours, days, etc.)
+# - Facies embeddings: Specialized for seismic facies classification
+# - Patch embeddings: Process data in local patches similar to Vision Transformers
+
+# ## Usage
+# Import and use these embedding layers as components in transformer model architectures:
+# - Standard data embedding with position information
+# - VMD-specific embeddings for decomposed signals
+# - Time-aware embeddings for sequential data
+# - Patch-based embeddings for processing local regions
+
+# Concise filename: `embedding_layers.py`
+
 import math
 
 import torch

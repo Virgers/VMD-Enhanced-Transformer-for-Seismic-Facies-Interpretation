@@ -1,5 +1,35 @@
+# Seismic Classification Experiment
+# Quick Start
+# Initialize the experiment:
+
+# Create experiment instance with configuration
+# Supports multiple model architectures
+# Works with both standard and VMD-processed seismic data
+# Compatible with multiple datasets (F3, New Zealand)
+# Train the model:
+
+# from exp.exp_classification import Exp_Classification
+
+# # Initialize experiment with configuration
+# exp = Exp_Classification(args)
+
+# # Define settings for experiment tracking
+# settings = {'model': args.model, 'vmd': args.is_vmd, 'mask': args.mask_rate}
+
+# # Train the model
+# model = exp.train(settings)
+# Test trained model:
+
+# # Load and evaluate model
+# exp.test(settings)
+# Output
+# Training logs: Loss, accuracy, and validation metrics
+# Model checkpoints: Saved with early stopping based on validation performance
+# Test results: Detailed metrics (accuracy, recall, precision, F1-score)
+# Prediction file: NumPy array with model predictions for further analysis
+
 import os
-# import pdb
+
 import time
 import warnings
 
@@ -39,7 +69,7 @@ class Exp_Classification(Exp_Basic):
          
         if dataset=='f3':
             from data_provider.datafactory import data_provider
-        else:
+        else: # dataset for new zealand
             from data_provider.datafactory2 import data_provider
 
         data_set, data_loader = data_provider(self.args, is_vmd, flag)

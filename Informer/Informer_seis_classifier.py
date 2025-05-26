@@ -2,7 +2,7 @@ import os
 import torch
 import datetime
 
-from NSTformer_cls_options import Options, setup
+from Informer.Informer_seis_cls_cfg import Options, setup
 
 device = torch.device('cuda:0')
 torch.cuda.set_device(device)
