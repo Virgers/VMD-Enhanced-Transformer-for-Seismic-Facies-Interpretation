@@ -1,17 +1,16 @@
-import torch    
 import argparse
-import random
-
-import logging
-import sys
-import os
-import traceback
 import json
-from datetime import datetime
+import logging
+import os
 import random
 import string
-import logging
+import sys
+import traceback
+from datetime import datetime
+
 import numpy as np
+import torch
+
 logger = logging.getLogger('__main__')
 
 

@@ -1,6 +1,10 @@
 import os
+
 import torch
-from models import Autoformer, Transformer, TimesNet, Nonstationary_Transformer,FEDformer, Informer, Reformer, Pyraformer,iTransformer, BiLSTM
+
+from models import (Autoformer, BiLSTM, FEDformer, Informer,
+                    Nonstationary_Transformer, Pyraformer, Reformer, TimesNet,
+                    Transformer, iTransformer)
 
 
 class Exp_Basic(object):
@@ -11,16 +15,11 @@ class Exp_Basic(object):
             'Autoformer': Autoformer,
             'Transformer': Transformer,
             'Nonstationary_Transformer': Nonstationary_Transformer,
-           
             'FEDformer': FEDformer,
             'Informer': Informer,
-           
             'Reformer': Reformer,
-          
             'Pyraformer': Pyraformer,
-          
             'iTransformer': iTransformer,
-         
             'BiLSTM': BiLSTM
         }
         self.device = self._acquire_device()
