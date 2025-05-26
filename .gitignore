@@ -42,3 +42,8 @@ checkpoints/
 *.pth
 checkpoint/
 output/
+*.history
+./history/
+./history
+./logs/
+./logs
