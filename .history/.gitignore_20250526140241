@@ -1,5 +1,9 @@
 ./checkpoint
 ./test_results
+./history
+./output
+./output/figures
+# Ignore all files in the output directory
 11.png
 Correlation Matrix.png
 facies_cls_distribution.png
