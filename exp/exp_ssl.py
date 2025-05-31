@@ -1,3 +1,4 @@
+# Similar as the exp_classification.py but for self supervised learning
 from data_provider.ssl_datafactory import data_provider
 from exp.exp_basic import Exp_Basic
 from utils.tools import adjust_learning_rate, visual, selfEarlyStopping

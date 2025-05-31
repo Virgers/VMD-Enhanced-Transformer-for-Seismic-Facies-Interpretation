@@ -29,7 +29,7 @@ class Options(object):
         self.parser = argparse.ArgumentParser(description='TimesNet')
         self.parser.add_argument('--config', dest='config_filepath',
                                  help='Configuration .json file (optional). Overwrites existing command-line args!')
-        self.parser.add_argument('--output_dir', default=r'F:\VMD-Enhanced-Transformer-for-Facies-Interpretation\test_output', 
+        self.parser.add_argument('--output_dir', default=r'output', 
                                  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
         # self.parser.add_argument('--output_dir', default='/home/dell/disk1/Jinlong/Time-Series-Library-main/output', 
                                 #  help='Root output directory. Must exist. Time-stamped directories will be created inside.')
@@ -45,7 +45,7 @@ class Options(object):
         self.parser.add_argument('--test_proportion', type=float, default=0.00001, help='seismic data for test')
 
         # F3dataset configuration   
-        self.parser.add_argument('--root_path', type=str, default=r'F:\Facies\FaciesData\F3Facies\train', help='root path of the data file')
+        self.parser.add_argument('--root_path', type=str, default=r'/home/dell/disk1/Jinlong/faciesdata', help='root path of the data file')
         self.parser.add_argument('--data_path', type=str, default='train_seismic.npy', help='data npy file')
         self.parser.add_argument('--label_path', type=str, default='train_labels.npy', help='label npy file')
         self.parser.add_argument('--mask_path', type=str, default='train_labels.npy', help='mask npy file')
