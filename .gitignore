@@ -1,4 +1,21 @@
-# Large files
+# Python cache files (more comprehensive)
+__pycache__/
+**/__pycache__/
+*.py[cod]
+**/*.py[cod]
+*$py.class
+**/*$py.class
+*.so
+**/*.so
+*.pyc
+**/*.pyc
+*.pyo
+**/*.pyo
+.Python
+env/
+venv/
+
+# Large files  
 *.pth
 *.pt
 *.pkl
@@ -15,14 +32,7 @@ logs/
 outputs/
 results/
 experiments/
-
-# Python
-__pycache__/
-*.py[cod]
-*.so
-.Python
-env/
-venv/
+output/
 
 # IDE
 .vscode/
@@ -33,18 +43,6 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
-*.pth
-*.npy
-*.h5
-data/
-checkpoints/
-*.npy
-*.pth
-checkpoint/
-output/
 
-*.history
-./history/
-./history
-./logs/
-./logs./output/
+# History files
+.history/
