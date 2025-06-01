@@ -1,13 +1,15 @@
-import torch    
 import argparse
-import random
-import logging
-import sys
-import os
-import traceback
 import json
+import logging
+import os
+import random
+import string
+import sys
+import traceback
 from datetime import datetime
+
 import numpy as np
+import torch
 
 logger = logging.getLogger('__main__')
 
@@ -18,51 +20,75 @@ class Options(object):
         torch.manual_seed(fix_seed)
         np.random.seed(fix_seed)
         
-        self.parser = argparse.ArgumentParser(description='BiLSTM Seismic Classification')
+        self.data = 'custom'
+        self.parser = argparse.ArgumentParser(
+            description='Run BiLSTM seismic classification pipeline. Optionally, a JSON configuration file can be used to overwrite command-line arguments.')
         
         # Basic configuration
         self.parser.add_argument('--config', dest='config_filepath',
-                                help='Configuration .json file (optional)')
-        self.parser.add_argument('--output_dir', default='/home/dell/disk1/Jinlong/Time-Series-Library-main/output', 
-                                help='Root output directory')
+                                help='Configuration .json file (optional). Overwrites existing command-line args!')
+        self.parser.add_argument('--output_dir', default=r'output', 
+                                help='Root output directory. Must exist. Time-stamped directories will be created inside.')
         
         # Experiment settings
-        self.parser.add_argument('--dataset', type=str, default='nz', choices=['f3', 'nz'])
+        self.parser.add_argument('--dataset', type=str, default='f3', choices=['f3', 'nz'])
         self.parser.add_argument('--is_training', type=int, default=1, help='training status')
         self.parser.add_argument('--is_testing', type=int, default=0, help='testing status')
         self.parser.add_argument('--task_name', type=str, default='classification')
-        self.parser.add_argument('--model', type=str, default='BiLSTM', help='model name')
-        
-        # Data paths
-        self.parser.add_argument('--root_path', type=str, default='/home/dell/disk1/Jinlong/faciesdata', 
-                                help='root path of the data file')
-        self.parser.add_argument('--data_path', type=str, default='data_train.npz', help='data file')
-        self.parser.add_argument('--label_path', type=str, default='labels_train.npz', help='label file')
-        self.parser.add_argument('--mask_path', type=str, default='labels_train.npz', help='mask file')
-        
-        # VMD settings
-        self.parser.add_argument('--vmd_data_path', type=str, default='full_F3_vmd.npy', help='vmd data file') 
-        self.parser.add_argument('--is_vmd', type=bool, default=False, help='whether using VMD')
-        
-        # Data proportions
-        self.parser.add_argument('--train_proportion', type=float, default=0.01, help='seismic data for train')
-        self.parser.add_argument('--test_proportion', type=float, default=1, help='seismic data for test')
-        self.parser.add_argument('--val_proportion', type=float, default=0.001, help='seismic data for validation')
-        
-        # Model checkpoints
-        self.parser.add_argument('--checkpoints', type=str, default='./checkpoints', 
-                                help='location of model checkpoints')
-        self.parser.add_argument('--checkpoints_test_only', type=str, 
-                                default='/home/dell/disk1/Jinlong/Time-Series-Library-main/checkpoints/...',
-                                help='location of model checkpoints for testing only')
+        self.parser.add_argument('--model', type=str, default='BiLSTM', 
+                                help='model name, options: [BiLSTM, iTransformer, iInformer, etc.]')
         
         # Training parameters
+        self.parser.add_argument('--batch_size', type=int, default=16, help='batch size of train input data')
         self.parser.add_argument('--train_epochs', type=int, default=15, help='train epochs')
-        self.parser.add_argument('--batch_size', type=int, default=16, help='batch size')
-        self.parser.add_argument('--learning_rate', type=float, default=0.01, help='learning rate')
+        self.parser.add_argument('--learning_rate', type=float, default=0.01, help='optimizer learning rate')
         self.parser.add_argument('--patience', type=int, default=10, help='early stopping patience')
         self.parser.add_argument('--itr', type=int, default=1, help='experiments times')
         
+        # Data proportions
+        self.parser.add_argument('--val_proportion', type=float, default=0.001, help='seismic data for validation')
+        self.parser.add_argument('--train_proportion', type=float, default=0.01, help='seismic data for train')
+        self.parser.add_argument('--test_proportion', type=float, default=0.01, help='seismic data for test')
+
+        # F3 dataset configuration   
+        self.parser.add_argument('--root_path', type=str, default=r'/home/dell/disk1/Jinlong/faciesdata', 
+                                help='root path of the data file')
+        self.parser.add_argument('--data_path', type=str, default='train_seismic.npy', help='data npy file')
+        self.parser.add_argument('--label_path', type=str, default='train_labels.npy', help='label npy file')
+        self.parser.add_argument('--mask_path', type=str, default='train_labels.npy', help='mask npy file')
+
+        # VMD settings
+        self.parser.add_argument('--vmd_data_path', type=str, default='full_F3_vmd.npy', help='vmd npy data file') 
+        self.parser.add_argument('--is_vmd', type=bool, default=False, help='whether using VMD')
+        self.parser.add_argument('--embedding_flag', type=bool, default=True, help='embedding flag')
+        self.parser.add_argument('--mask_rate', type=float, default=0.125, help='mask rate below is masked')
+        
+        # GPU settings
+        self.parser.add_argument('--gpu', type=int, default=0, help='gpu id')
+        self.parser.add_argument('--use_gpu', type=bool, default=True, help='use gpu')
+        self.parser.add_argument('--use_multi_gpu', action='store_true', help='use multiple gpus', default=False)
+        self.parser.add_argument('--devices', type=str, default='0', help='device ids of multiple gpus')
+        self.parser.add_argument('--num_workers', type=int, default=1, help='data loader num workers')
+
+        # Model checkpoints
+        self.parser.add_argument('--checkpoints', type=str, default=r'./checkpoints', 
+                                help='location of model checkpoints')
+        self.parser.add_argument('--checkpoints_test_only', type=str, 
+                                default=r'./checkpoints/best_model.pth',
+                                help='location of model checkpoints for testing only')
+
+        # Experiment tracking
+        self.parser.add_argument('--model_id', type=str, default='train', help='model id')
+        self.parser.add_argument('--exp_name', type=str, default='BiLSTM_Classification', help='experiment name')
+        self.parser.add_argument('--des', type=str, default='BiLSTM_seismic_classification', help='exp description')
+        
+        # Data loader
+        self.parser.add_argument('--data', type=str, default='TSF', help='dataset type')
+        self.parser.add_argument('--features', type=str, default='S',
+                                help='forecasting task, options:[M, S, MS]')
+        self.parser.add_argument('--target', type=str, default='OT', help='target feature in S or MS task')
+        self.parser.add_argument('--freq', type=str, default='h', help='freq for time features encoding')
+
         # BiLSTM specific parameters
         self.parser.add_argument('--seq_len', type=int, default=255, help='input sequence length')
         self.parser.add_argument('--hidden_size', type=int, default=64, help='BiLSTM hidden size')
@@ -72,24 +98,24 @@ class Options(object):
         
         # Input/Output dimensions
         self.parser.add_argument('--enc_in', type=int, default=1, help='encoder input size')
+        self.parser.add_argument('--dec_in', type=int, default=1, help='decoder input size')
+        self.parser.add_argument('--c_out', type=int, default=6, help='output size')
         self.parser.add_argument('--num_class', type=int, default=6, help='number of classes')
         self.parser.add_argument('--num_class2', type=int, default=6, help='number of classes (duplicate)')
         
-        # Processing parameters
-        self.parser.add_argument('--mask_rate', type=float, default=0.125, help='mask rate')
-        self.parser.add_argument('--embedding_flag', type=bool, default=True, help='embedding flag')
+        # Additional parameters for compatibility
+        self.parser.add_argument('--d_model', type=int, default=64, help='dimension of model (for compatibility)')
+        self.parser.add_argument('--embed_size', type=int, default=64, help='embedding dimension')
+        self.parser.add_argument('--max_features', type=int, default=255, help='vocabulary size')
         
-        # GPU settings
-        self.parser.add_argument('--gpu', type=int, default=0, help='gpu id')
-        self.parser.add_argument('--use_gpu', type=bool, default=True, help='use gpu')
-        self.parser.add_argument('--use_multi_gpu', action='store_true', help='use multiple gpus', default=False)
-        self.parser.add_argument('--devices', type=str, default='0', help='device ids')
-        self.parser.add_argument('--num_workers', type=int, default=1, help='data loader num workers')
+        # Optimization
+        self.parser.add_argument('--loss', type=str, default='CrossEntropy', help='loss function')
+        self.parser.add_argument('--lradj', type=str, default='type1', help='adjust learning rate')
+        self.parser.add_argument('--use_amp', action='store_true', help='use automatic mixed precision training', default=False)
         
-        # Experiment tracking
-        self.parser.add_argument('--model_id', type=str, default='train', help='model id')
-        self.parser.add_argument('--exp_name', type=str, default='BiLSTM_Classification', help='experiment name')
-        self.parser.add_argument('--des', type=str, default='BiLSTM_seismic_classification', help='exp description')
+        # Additional experiment settings
+        self.parser.add_argument('--inverse', action='store_true', help='inverse output data', default=False)
+        self.parser.add_argument('--use_norm', type=int, default=True, help='use norm and denorm')
 
     def parse(self):
         args = self.parser.parse_args()
@@ -106,24 +132,13 @@ class Options(object):
         return args
 
 def load_config(config_filepath):
-    """
-    Using a json file with the master configuration (config file for each part of the pipeline),
-    return a dictionary containing the entire configuration settings in a hierarchical fashion.
-    """
-
+    """Load configuration from JSON file"""
     with open(config_filepath) as cnfg:
         config = json.load(cnfg)
-
     return config
 
-
 def create_dirs(dirs):
-    """
-    Input:
-        dirs: a list of directories to create, in case these directories are not found
-    Returns:
-        exit_code: 0 if success, -1 if failure
-    """
+    """Create directories if they don't exist"""
     try:
         for dir_ in dirs:
             if not os.path.exists(dir_):
@@ -133,20 +148,13 @@ def create_dirs(dirs):
         print("Creating directories error: {0}".format(err))
         exit(-1)
 
-
 def setup(args):
-    """Prepare training session: read configuration from file (takes precedence), create directories.
-    Input:
-        args: arguments object from argparse
-    Returns:
-        config: configuration dictionary
-    """
-
+    """Prepare training session: read configuration from file, create directories"""
     config = args.__dict__  # configuration dictionary
 
     if args.config_filepath is not None:
         logger.info("Reading configuration ...")
-        try:  # dictionary containing the entire configuration settings in a hierarchical fashion
+        try:
             config.update(load_config(args.config_filepath))
         except:
             logger.critical("Failed to load configuration file. Check JSON syntax and verify that files exist")
@@ -180,4 +188,3 @@ def setup(args):
     logger.info("Stored configuration file in '{}'".format(output_dir))
 
     return config
-

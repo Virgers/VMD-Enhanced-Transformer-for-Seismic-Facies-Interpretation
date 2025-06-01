@@ -1,7 +1,6 @@
+import datetime
 import os
 import torch
-import datetime
-
 from BiLSTM.BiLSTM_seis_cls_cfg import Options, setup
 
 num_gpus = torch.cuda.device_count()
@@ -13,58 +12,59 @@ torch.cuda.set_device(device)
 os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 
 def main(config):
-    from BiLSTMexpcls import Exp_Classification
+    from exp.BiLSTMexpcls import Exp_Classification
     Exp = Exp_Classification
-   
+
     now = datetime.datetime.now()
-    formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+    formatted_date_time = now.strftime("%Y%m%d_%H%M")
     
     if args.is_training:
         for ii in range(args.itr):
             args.model_id = 'Train' 
             setting = {
-                'timestamp': formatted_date_time,
-                'model': args.model,
-                'dataset': args.dataset,
-                'train_prop': args.train_proportion,
-                'test_prop': args.test_proportion,
-                'mask_rate': args.mask_rate,
-                'is_vmd': args.is_vmd,
-                'embed_flag': args.embedding_flag,
-                'epochs': args.train_epochs,
-                'batch_size': args.batch_size,
-                'hidden_size': args.hidden_size,
-                'num_layers': args.num_layers,
-                'iteration': ii
+                "datetime": formatted_date_time,
+                "model": args.model,
+                "dataset": args.dataset,
+                "train_prop": f"{args.train_proportion:.3f}",
+                "test_prop": f"{args.test_proportion:.3f}",
+                "mask_rate": f"{args.mask_rate:.3f}",
+                "is_vmd": str(args.is_vmd),
+                "embed": str(args.embedding_flag),
+                "epochs": str(args.train_epochs),
+                "batch": str(args.batch_size),
+                "hidden": str(args.hidden_size),
+                "layers": str(args.num_layers),
+                "iter": str(ii)
             }
             
             exp = Exp(args)
-            print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+            formatted_setting = ' | '.join([f"{k}:{v}" for k, v in setting.items()])
+            print('>>Start training : {}>>'.format(formatted_setting))
             exp.train(setting)
             
-            print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+            formatted_setting = ' | '.join([f"{k}:{v}" for k, v in setting.items()])
+            print('>>testing : {}<<'.format(formatted_setting))
             exp.test(setting)
             
             torch.cuda.empty_cache()
 
     if args.is_testing:
-        args.model_id = 'test' 
+        args.model_id = 'Test' 
         setting = {
-            'timestamp': formatted_date_time,
-            'model': args.model,
-            'dataset': args.dataset,
-            'test_prop': args.test_proportion,
-            'mask_rate': args.mask_rate,
-            'is_vmd': args.is_vmd,
-            'embed_flag': args.embedding_flag,
-            'epochs': args.train_epochs,
-            'batch_size': args.batch_size,
-            'hidden_size': args.hidden_size,
-            'num_layers': args.num_layers
+            "datetime": formatted_date_time,
+            "model": args.model,
+            "dataset": args.dataset,
+            "test_prop": f"{args.test_proportion:.3f}",
+            "mask_rate": f"{args.mask_rate:.3f}",
+            "is_vmd": str(args.is_vmd),
+            "embed": str(args.embedding_flag),
+            "hidden": str(args.hidden_size),
+            "layers": str(args.num_layers)
         }
 
         exp = Exp(args)
-        print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+        formatted_setting = ' | '.join([f"{k}:{v}" for k, v in setting.items()])
+        print('>>testing : {}<<'.format(formatted_setting))
         exp.test(setting, test=0)
         torch.cuda.empty_cache()
 

@@ -1,4 +1,4 @@
-from test_datafactory2 import data_provider
+from data_provider.datafactory import data_provider
 # from test_datafactory import data_provider
 from exp.exp_basic import Exp_Basic
 from utils.tools import LSTMEarlyStopping, adjust_learning_rate
@@ -266,7 +266,7 @@ class Exp_Classification(Exp_Basic):
         self.model.eval()
         self.model = self.model.to(self.device)
         with torch.no_grad():
-            for i, (batch_x, label, padding_mask, x_mark_enc_binary) in enumerate(vali_loader):
+            for i, (batch_x, label, padding_mask) in enumerate(vali_loader):
             # for i, (batch_x, label) in enumerate(vali_loader):
                 batch_x = batch_x.float().to(self.device)
                 # padding_mask = padding_mask.float().to(self.device)
@@ -274,7 +274,7 @@ class Exp_Classification(Exp_Basic):
                 # x_mark_enc_binary = x_mark_enc_binary.to(self.device)
                 batch_x = torch.transpose(batch_x, -1, 1)
                 outputs = self.model(batch_x)
-                outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len2, 1)
+                outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len, 1)
                 # outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len, 1)
 
                 pred = outputs.detach().cpu()
@@ -309,7 +309,7 @@ class Exp_Classification(Exp_Basic):
 
                 batch_x = torch.transpose(batch_x, -1, 1)
                 outputs = self.model(batch_x)
-                outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len2, 1)
+                outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len, 1)
                 # outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len, 1)
                
                 pred = outputs.detach().cpu()
@@ -329,8 +329,11 @@ class Exp_Classification(Exp_Basic):
     
     def train(self, setting):
         _, train_loader = self._get_data(is_vmd=self.args.is_vmd, flag='train')
-       
-        path = os.path.join(self.args.checkpoints, setting)
+    
+        # Convert dictionary setting to string for path
+        dir_name = "_".join([f"{v}" for v in setting.values()])
+        path = os.path.join(self.args.checkpoints, dir_name)
+        
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -348,23 +351,16 @@ class Exp_Classification(Exp_Basic):
             self.model.train()
             epoch_time = time.time()
 
-            for i, (batch_x, label, padding_mask, x_mark_enc_binary) in enumerate(train_loader):
-            # for i, (batch_x, label) in enumerate(train_loader):
-
+            for i, (batch_x, label, padding_mask) in enumerate(train_loader):
                 iter_count += 1
                 model_optim.zero_grad()
                 batch_x = batch_x.float().to(self.device)
-                # padding_mask = padding_mask.float().to(self.device)
-                
                 label = label.to(self.device)
-                # x_mark_enc_binary = x_mark_enc_binary.to(self.device)
                 batch_x = torch.transpose(batch_x, -1, 1)
-                # outputs = self.model(batch_x, padding_mask, None, None)
-                outputs = self.model(batch_x) # batch_x: 16 1 255
-                outputs = outputs.reshape(-1, self.args.num_class2, self.args.seq_len2, 1)
-                # outputs = outputs.reshape(-1, self.args.num_class2, self.args.seq_len, 1)
-                loss = criterion(outputs, label.long()) # we change the type and squeeze
-              
+                outputs = self.model(batch_x)
+                outputs = outputs.reshape(-1, self.args.num_class2, self.args.seq_len, 1)
+                loss = criterion(outputs, label.long())
+            
                 loss.backward()
                 model_optim.step()
                 nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=4.0)
@@ -383,7 +379,6 @@ class Exp_Classification(Exp_Basic):
             train_loss = np.average(train_loss)
             
             vali_loss, val_accuracy = self.vali(criterion)
-            # val_test_loss, val_test_accuracy = self.vali_test(criterion)
 
             print(
                 "Epoch: {0}, Steps: {1} | Train Loss: {2:.3f} Vali Loss: {3:.3f} Vali Acc: {4:.3f}"
@@ -396,35 +391,37 @@ class Exp_Classification(Exp_Basic):
                 adjust_learning_rate(model_optim, epoch + 1, self.args)
 
         best_model_path = path + '/' + 'checkpoint.pth'
-        
-
-        # # Load the test model
-        # best_model_path = path + '/' + 'checkpoint.pth'
-        # test_model = YourModelClass()
         self.model.load_state_dict(torch.load(best_model_path, map_location=torch.device('cuda:1')))
-        # self.model.load_state_dict(torch.load(best_model_path), map_location='cuda:1')
 
         return self.model
 
 
     def test(self, setting):
         _, test_loader = self._get_data(is_vmd=self.args.is_vmd, flag='test')
-      
+    
         print('loading model')
 
         if self.args.is_training:
-             self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
+            # Convert dictionary setting to string for path
+            dir_name = "_".join([f"{v}" for v in setting.values()])
+            checkpoint_path = os.path.join('./checkpoints', dir_name, 'checkpoint.pth')
+            self.model.load_state_dict(torch.load(checkpoint_path))
         else:
             self.model.load_state_dict(torch.load(self.args.checkpoints_test_only))
 
         print('load successfully!')
-    
+
         accuracy = 0
         total_samples = 0
         total_correct = 0
-        folder_path = './test_results/' + setting + '/'
+        
+        # Convert dictionary setting to string for results folder
+        dir_name = "_".join([f"{v}" for v in setting.values()])
+        folder_path = os.path.join('./test_results', dir_name)
+        
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
+            
         pred_label_all = None
         self.model.eval()
         num_classes = 6
@@ -433,72 +430,31 @@ class Exp_Classification(Exp_Basic):
         predict_num = torch.zeros((1, num_classes)) 
 
         with torch.no_grad():
-            start_time = time.time()  # Start time
+            start_time = time.time()
             for i, (batch_x, label, padding_mask, x_mark_enc_binary) in enumerate(test_loader):
-            # for i, (batch_x, label) in enumerate(test_loader):
-            
                 batch_x = batch_x.float().to(self.device)
-                
                 label = label.to(self.device)
-                
                 batch_x = torch.transpose(batch_x, -1, 1)
                 outputs = self.model(batch_x)
-                outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len2, 1)
-                # outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len, 1)
+                outputs = outputs.reshape(-1, self.args.num_class, self.args.seq_len, 1)
 
                 pred = outputs.detach().cpu()
-                probs = torch.nn.functional.softmax(pred)  # (total_samples, num_classes) est. prob. for each class and sample
-                predictions = torch.argmax(probs, dim=1) # (total_samples,) int class index for each sample
+                probs = torch.nn.functional.softmax(pred)
+                predictions = torch.argmax(probs, dim=1)
                 total_correct += (predictions.cpu() == label.cpu()).sum().item()
                 total_samples += label.size(0) * label.size(1)
-                # preds.append(outputs.detach())
-                # trues.append(label)
+                
                 pred_label_all = np.concatenate(
                 (pred_label_all, predictions.cpu())) if pred_label_all is not None else predictions.cpu()
-                
-                # outputs = outputs.reshape(-1, num_classes)
 
-                # pre_mask = torch.zeros(outputs.size()).scatter_(1, predictions.cpu().view(-1, 1), 1.)
-                # predict_num += pre_mask.sum(0)
-                # test_label = label.long()
-
-                # tar_mask = torch.zeros(outputs.size()).scatter_(1, test_label.data.cpu().view(-1, 1), 1.)
-                # target_num += tar_mask.sum(0)
-                # acc_mask = pre_mask * tar_mask
-                # acc_num += acc_mask.sum(0)
-
-
-        # accuracy = total_correct / total_samples
-        # # result save
+        # Save results with proper directory structure
+        results_folder = os.path.join('./results', dir_name)
+        if not os.path.exists(results_folder):
+            os.makedirs(results_folder)
         
-        folder_path = './results/' + setting + '/'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        
-        np.save(os.path.join(folder_path, 'bilstm_nz_facies.npy'), pred_label_all)
-        end_time = time.time()  # End time
-        total_test_time = end_time - start_time  # Total test time
+        np.save(os.path.join(results_folder, 'bilstm_nz_facies.npy'), pred_label_all)
+        end_time = time.time()
+        total_test_time = end_time - start_time
         print('Total test time: {:.2f} seconds'.format(total_test_time))
 
-
-        # recall = acc_num / target_num
-        # precision = acc_num / predict_num + float('1e-8')
-        # F1 = 2 * recall * precision / (recall + precision)
-        # accuracy = 100. * acc_num.sum(1) / target_num.sum(1)
-
-        # print('Predicted results saved!:)')
-        # print('accuracy:{}'.format(accuracy))
-
-        # print('Test Acc {}'.format(accuracy))
-        # print('recall {}'.format(recall))
-        # print('precision {}'.format(precision))
-        # print('F1-score {}'.format(F1))
-
-        # file_name='result_classification.txt'
-        # f = open(os.path.join(folder_path,file_name), 'a')
-        # f.write(setting + "  \n")
-        # f.write('accuracy:{}'.format(accuracy))
-        # f.write('\n')
-        # f.write('\n')
-        # f.close()
         return

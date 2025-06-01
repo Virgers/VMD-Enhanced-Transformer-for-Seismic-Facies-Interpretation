@@ -42,9 +42,9 @@ class Model(nn.Module):
         # num_layers default
         # output_size num classes
         # input_size = configs.seq_len2
-        input_size = configs.seq_len2
+        input_size = configs.seq_len
         hidden_size = configs.d_model
-        num_layers = configs.e_layers
+        num_layers = configs.num_layers
         output_size = configs.num_class2
         dropout_rate = configs.dropout
         # self.hidden_size = hidden_size
